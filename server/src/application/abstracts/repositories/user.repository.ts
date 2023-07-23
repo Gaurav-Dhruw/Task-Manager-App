@@ -1,9 +1,7 @@
 import { User } from 'src/domain/entities';
-import { IGenericRepository } from '../abstracts';
+import { IGenericRepository } from './';
 
-export abstract class IUserRepository
-  implements IGenericRepository<User>
-{
+export abstract class IUserRepository implements IGenericRepository<User> {
   abstract getAll(): Promise<User[]>;
   abstract get(id: string): Promise<User>;
   abstract create(item: User): Promise<User>;

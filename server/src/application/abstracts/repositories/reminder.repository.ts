@@ -1,5 +1,5 @@
 import { Reminder } from 'src/domain/entities';
-import { IGenericRepository } from '../abstracts';
+import { IGenericRepository } from './';
 
 export abstract class IReminderRepository
   implements IGenericRepository<Reminder>

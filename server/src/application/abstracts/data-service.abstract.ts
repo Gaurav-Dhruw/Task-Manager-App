@@ -1,5 +1,5 @@
 import { Reminder, Task, Team, User, Comment } from 'src/domain/entities';
-import { IGenericRepository } from './';
+import { IGenericRepository } from '.';
 
 export abstract class IDataService {
   users: IGenericRepository<User>;
