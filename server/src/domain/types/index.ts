@@ -1,3 +1,5 @@
+import { Team } from "../entities";
+
 export enum Priority {
   Low,
   Mid,
@@ -9,4 +11,12 @@ export enum Status {
   Finished,
   Unfinished,
   PastDeadline,
+}
+
+export interface OptionalUserInitializerData {
+  id?: string;
+  email?: string;
+  name?: string;
+  password?: string;
+  profile_pic?: string;
 }
