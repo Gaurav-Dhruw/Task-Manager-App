@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
-import jwt, { JwtPayload } from 'jsonwebtoken';
+import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
+import * as jwt from 'jsonwebtoken';
 import { ITokenService } from 'src/domain/abstracts';
 import { User } from 'src/domain/entities';
 
 @Injectable()
-export class JwtService implements ITokenService {
+export class JwtService implements ITokenService, OnApplicationBootstrap {
   jwt: typeof jwt;
   secretKey: string;
 
@@ -23,15 +23,17 @@ export class JwtService implements ITokenService {
 
   decodeToken(token: string): User | undefined {
     const decoded = jwt.verify(token, this.secretKey);
-    if(this.isJwtPayload(decoded)){
-        const user = new User();
-        user.id = decoded?.id;
-        user.email = decoded?.email;
-        return user;
+    if (this.isJwtPayload(decoded)) {
+      const user = new User();
+      user.id = decoded?.id;
+      user.email = decoded.email;
+      return user;
     }
   }
 
-  isJwtPayload(data:string | JwtPayload): data is JwtPayload{
-    return (data as JwtPayload).iat === undefined;
+  isJwtPayload(data: string | jwt.JwtPayload): data is jwt.JwtPayload {
+    return (data as jwt.JwtPayload).iat === undefined;
   }
+
+  onApplicationBootstrap() {}
 }

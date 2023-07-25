@@ -3,6 +3,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { IDataService } from 'src/domain/abstracts';
 import { TypeOrmDataService } from './typeorm-data-service.service';
 import { Comment, Notification, Reminder, Task, Team, User } from './entities';
+import { UserRepository } from './repositories/user.repository';
+import { TeamRepository } from './repositories/team.repository';
+import { TaskRepository } from './repositories/task.repository';
+import { CommentRepository } from './repositories/comment.repository';
+import { ReminderRepository } from './repositories/reminder.repository';
+import { NotificationRepository } from './repositories/notification.repository';
 
 @Module({
   imports: [
@@ -18,8 +24,16 @@ import { Comment, Notification, Reminder, Task, Team, User } from './entities';
         synchronize: true,
       }),
     }),
+    TypeOrmModule.forFeature([
+      User,
+      Team,
+      Task,
+      Reminder,
+      Notification,
+      Comment,
+    ]),
   ],
-  providers: [
+  providers: [UserRepository, TeamRepository, TaskRepository, CommentRepository, ReminderRepository, NotificationRepository,
     {
       provide: IDataService,
       useClass: TypeOrmDataService,

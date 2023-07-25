@@ -1,9 +1,7 @@
-import { Module } from "@nestjs/common";
-import { CommentController } from "./comment.controller";
-
+import { Module } from '@nestjs/common';
+import { CommentController } from './comment.controller';
 
 @Module({
-    imports:[],
-    providers:[CommentController],
+  controllers: [CommentController],
 })
-export class CommentModule{}
+export class CommentModule {}

@@ -3,11 +3,12 @@ import { ITokenService } from 'src/domain/abstracts';
 import { JwtService } from './jwt.service';
 
 @Module({
-  exports: [
+  providers: [
     {
       provide: ITokenService,
       useClass: JwtService,
     },
   ],
+  exports: [ITokenService],
 })
 export class TokenServiceModule {}

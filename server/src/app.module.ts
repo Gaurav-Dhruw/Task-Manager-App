@@ -1,9 +1,24 @@
-import { Module } from '@nestjs/common';
-import { DataServicesModule } from './infrastructure/data-services/data-service.module';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { ServicesModule } from './infrastructure/services/services.module';
 import { ConfigModule } from '@nestjs/config';
+import { AuthMiddleware } from './presentation/common/middlewares/auth.middleware';
+import { ControllersModule } from './presentation/modules/controllers.module';
+import { UseCasesModule } from './application/use-cases/use-cases.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), DataServicesModule],
+  imports: [
+    ConfigModule.forRoot(),
+    ServicesModule,
+    UseCasesModule,
+    ControllersModule,
+  ],
   providers: [],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(AuthMiddleware)
+      .exclude('user/login', 'user/sign-up')
+      .forRoutes('user', 'team', 'task', 'comment', 'reminder', 'notification');
+  }
+}
