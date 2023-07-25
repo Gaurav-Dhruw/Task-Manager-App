@@ -17,17 +17,21 @@ export class Team {
   @Column()
   team_name: string;
 
-  @Column()
-  display_pic: string;
+  @Column({
+    nullable:true
+  })
+  display_pic?: string;
 
   @ManyToMany(() => User)
   @JoinTable()
   admins: User[];
 
-  @ManyToMany(() => User)
+  @ManyToMany(() => User, (user)=>user.teams)
   @JoinTable()
   members: User[];
 
-  @OneToMany(() => Task, (task) => task.team)
-  tasks: Task[];
+  @OneToMany(() => Task, (task) => task.team,{
+    nullable:true
+  })
+  tasks?: Task[];
 }

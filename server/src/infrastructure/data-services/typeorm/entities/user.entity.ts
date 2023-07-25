@@ -7,7 +7,9 @@ export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({
+    unique:true
+  })
   email: string;
 
   @Column()
@@ -16,14 +18,20 @@ export class User {
   @Column()
   password: string;
 
-  @Column()
+  @Column({
+    nullable:true
+  })
   profile_pic: string;
 
-  @ManyToMany(() => Team)
-  @JoinTable()
+  @ManyToMany(() => Team,(team)=>team.members,{
+    nullable:true
+  })
+  @JoinTable({})
   teams?: Team[];
 
-  @ManyToOne(() => Reminder, (reminder) => reminder.receivers)
+  @ManyToOne(() => Reminder, (reminder) => reminder.receivers,{
+    nullable:true,
+  })
   @JoinTable()
   reminders?: Reminder[];
 }

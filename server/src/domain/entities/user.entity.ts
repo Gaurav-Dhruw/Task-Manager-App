@@ -6,6 +6,6 @@ export class User {
     email:string;
     name:string;
     password:string;
-    profile_pic:string;
+    profile_pic?:string;
     teams?: Team[];
 }

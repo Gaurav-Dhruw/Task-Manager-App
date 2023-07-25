@@ -9,12 +9,14 @@ export class Comment {
   @Column()
   content: string;
 
-  @Column()
+  @Column({
+    default: () => 'NOW()',
+  })
   created_at: Date;
 
-  @ManyToOne(()=>User)
+  @ManyToOne(() => User)
   user: User;
 
-  @ManyToOne(()=>Task)
+  @ManyToOne(() => Task)
   task: Task;
 }

@@ -20,14 +20,16 @@ export class Task {
   @Column()
   title: string;
 
-  @Column()
-  description: string;
+  @Column({
+    nullable:true
+  })
+  description?: string;
 
   @Column({ type: 'enum', enum: Status, default: Status.Unfinished })
   status: Status;
 
-  @Column({ type: 'enum', enum: Priority, default: Priority.Mid })
-  priority: Priority;
+  @Column({ type: 'enum', enum: Priority, nullable:true})
+  priority?: Priority;
 
   @OneToOne(() => User)
   @JoinColumn()
@@ -37,10 +39,14 @@ export class Task {
   @JoinTable()
   assigned_to: User[];
 
-  @ManyToOne(() => Team, (team) => team.tasks)
+  @ManyToOne(() => Team, (team) => team.tasks, {
+    nullable:true
+  })
   team?: Team;
 
-  @OneToOne(() => Reminder, (reminder) => reminder.task)
+  @OneToOne(() => Reminder, (reminder) => reminder.task,{
+    nullable:true
+  })
   @JoinColumn()
   reminder?: Reminder;
 }

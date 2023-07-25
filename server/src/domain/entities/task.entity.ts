@@ -4,11 +4,11 @@ import { Reminder, Team, User } from './';
 export class Task {
   id: string;
   title: string;
-  description: string;
+  description?: string;
   status: Status;
-  priority: Priority;
+  priority?: Priority;
   created_by: User;
   assigned_to: User[];
-  team: Team;
-  reminder: Reminder;
+  team?: Team;
+  reminder?: Reminder;
 }

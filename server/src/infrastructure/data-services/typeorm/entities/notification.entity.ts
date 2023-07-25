@@ -1,5 +1,5 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { User } from "./";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { User } from './';
 
 @Entity()
 export class Notification {
@@ -12,6 +12,8 @@ export class Notification {
   @Column()
   content: string;
 
-  @Column()
+  @Column({
+    default: false,
+  })
   is_read: boolean;
 }
