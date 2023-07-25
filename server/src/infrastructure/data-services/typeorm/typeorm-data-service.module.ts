@@ -1,23 +1,34 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { IDataService } from 'src/application/abstracts';
+import { IDataService } from 'src/domain/abstracts';
 import { TypeOrmDataService } from './typeorm-data-service.service';
-
+import { Comment, Notification, Reminder, Task, Team, User } from './entities';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: process.env.DATABASE_URL,
-      port: 5432,
-      autoLoadEntities: true,
-      synchronize: true,
+    TypeOrmModule.forRootAsync({
+      useFactory: () => ({
+        type: 'postgres',
+
+        url: process.env.DATABASE_URL,
+        ssl: {
+          rejectUnauthorized: false,
+        },
+        entities: [User, Team, Task, Reminder, Notification, Comment],
+        synchronize: true,
+      }),
     }),
   ],
-  providers: [{
-    provide:IDataService,
-    useClass:TypeOrmDataService
-  }],
-  exports:[IDataService]
+  providers: [
+    {
+      provide: IDataService,
+      useClass: TypeOrmDataService,
+    },
+  ],
+  exports: [IDataService],
 })
-export class TypeOrmDataServiceModule {}
+export class TypeOrmDataServiceModule {
+  constructor() {
+    // console.log(process.env);
+  }
+}

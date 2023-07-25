@@ -1,2 +1,2 @@
-export * from './data-service.abstract';
+export * from './services';
 export * from './repositories';
