@@ -1,5 +1,5 @@
 import { Notification } from 'src/domain/entities';
-import { IGenericRepository } from './';
+import { IGenericRepository } from '.';
 
 export abstract class INotificationRepository
   implements IGenericRepository<Notification>

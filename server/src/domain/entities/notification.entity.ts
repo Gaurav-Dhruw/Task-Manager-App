@@ -1,9 +1,13 @@
 import { User } from "./";
 
 
-export class Notification{
-    id: string;
-    receiver: User;
-    content: string;
-    is_read: boolean;
+export class Notification {
+  id: string;
+  receiver: User;
+  content: string;
+  is_read: boolean;
+
+  constructor(data?: Partial<Notification>) {
+    Object.assign(this, data);
+  }
 }

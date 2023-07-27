@@ -1,5 +1,5 @@
 import { User } from 'src/domain/entities';
-import { IGenericRepository } from './';
+import { IGenericRepository } from '.';
 
 export abstract class IUserRepository implements IGenericRepository<User> {
   abstract getAll(): Promise<User[]>;

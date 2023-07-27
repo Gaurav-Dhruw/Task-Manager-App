@@ -1,7 +1,9 @@
 import { Comment } from 'src/domain/entities';
-import { IGenericRepository } from './';
+import { IGenericRepository } from '.';
 
-export abstract class ICommentRepository implements IGenericRepository<Comment> {
+export abstract class ICommentRepository
+  implements IGenericRepository<Comment>
+{
   abstract getAll(): Promise<Comment[]>;
   abstract getById(id: string): Promise<Comment>;
   abstract create(item: Comment): Promise<Comment>;

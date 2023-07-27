@@ -1,7 +1,9 @@
 import { Reminder } from 'src/domain/entities';
-import { IGenericRepository } from './';
+import { IGenericRepository } from '.';
 
-export abstract class IReminderRepository implements IGenericRepository<Reminder> {
+export abstract class IReminderRepository
+  implements IGenericRepository<Reminder>
+{
   abstract getAll(): Promise<Reminder[]>;
   abstract getById(id: string): Promise<Reminder>;
   abstract create(item: Reminder): Promise<Reminder>;

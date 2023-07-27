@@ -6,7 +6,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class TeamRepository implements ITeamRepository {
-  constructor(@InjectRepository(Team) teamRepository: Repository<Team>) {}
+  constructor(
+    @InjectRepository(Team) private readonly teamRepository: Repository<Team>,
+  ) {}
 
   getById(id: string): Promise<Team> {
     return;
@@ -14,8 +16,9 @@ export class TeamRepository implements ITeamRepository {
   getAll(): Promise<Team[]> {
     return;
   }
-  create(item: Team): Promise<Team> {
-    return;
+  create(team: Team): Promise<Team> {
+    console.log(team);
+    return this.teamRepository.save(team);
   }
   update(id: string, item: Team): Promise<Team> {
     return;

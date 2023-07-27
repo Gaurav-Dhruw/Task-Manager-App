@@ -1,5 +1,5 @@
 import { Task } from 'src/domain/entities';
-import { IGenericRepository } from './';
+import { IGenericRepository } from '.';
 
 export abstract class ITaskRepository implements IGenericRepository<Task> {
   abstract getAll(): Promise<Task[]>;

@@ -7,7 +7,6 @@ import {
 import {
   IDataService,
   IHashService,
-  ITokenService,
 } from 'src/domain/abstracts';
 import { User } from 'src/domain/entities';
 
@@ -15,35 +14,32 @@ import { User } from 'src/domain/entities';
 export class UserUseCases {
   constructor(
     private readonly dataService: IDataService,
-    private readonly tokenService: ITokenService,
     private readonly hashService: IHashService,
   ) {}
 
-  async loginUser(userData: {
-    email: string;
-    password: string;
-  }): Promise<User & { token: string }> {
-    const user = await this.dataService.user.getByEmail(userData?.email);
-    if (!user) throw new NotFoundException();
-    else if (!this.hashService.verify(userData.password, user.password))
+  async loginUser(inputUser: User): Promise<User> {
+    const user = await this.dataService.user.getByEmail(inputUser.email);
+    if (!user) throw new NotFoundException('User Not Found');
+    else if (!this.hashService.verify(inputUser.password, user.password))
       throw new UnauthorizedException();
 
-    const token = this.tokenService.generateToken(user);
-
-    return { ...user, token };
+    return user;
   }
 
-  async registerUser(userData: {
-    email: string;
-    password: string;
-    name: string;
-  }): Promise<User & { token: string }> {
-    const user = await this.dataService.user.getByEmail(userData?.email);
-    console.log(user);
-    if (!user) throw new BadRequestException();
+  async registerUser(inputUser: User): Promise<User> {
+    const isAlreadyRegistered =
+      (await this.dataService.user.getByEmail(inputUser.email)) !== null;
+    if (isAlreadyRegistered)
+      throw new BadRequestException('Email Already Registered');
 
-    const token = this.tokenService.generateToken(user);
+    inputUser.password = this.hashService.hash(inputUser.password);
+    const registeredUser = await this.dataService.user.create(inputUser);
+    console.log(registeredUser);
+    return registeredUser;
+  }
 
-    return { ...user, token };
+  async updateUser(inputUser: User): Promise<User> {
+    console.log('Update User Hit');
+    return this.dataService.user.update(inputUser.id, inputUser);
   }
 }

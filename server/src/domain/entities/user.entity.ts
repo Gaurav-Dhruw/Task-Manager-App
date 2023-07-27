@@ -1,6 +1,5 @@
-import { PartialType } from '@nestjs/mapped-types';
 import { Team } from './';
-import { OptionalUserInitializerData } from '../types';
+
 
 export class User {
   id: string;
@@ -10,13 +9,7 @@ export class User {
   profile_pic?: string;
   teams?: Team[];
 
-  constructor(data?: OptionalUserInitializerData) {
-    this.id = data?.id;
-    this.email = data?.email;
-    this.name = data?.name;
-    this.password = data.password;
-    this.profile_pic = data.profile_pic;
+  constructor(data?: Partial<User>) {
+    Object.assign(this,data);
   }
 }
-
-

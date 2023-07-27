@@ -1,4 +1,4 @@
-import { Task, User } from "./";
+import { Task, User } from './';
 
 export class Team {
   id: string;
@@ -6,5 +6,9 @@ export class Team {
   display_pic?: string;
   admins: User[];
   members: User[];
-  tasks?:Task[];
+  tasks?: Task[];
+
+  constructor(data?: Partial<Team>) {
+    Object.assign(this, data);
+  }
 }

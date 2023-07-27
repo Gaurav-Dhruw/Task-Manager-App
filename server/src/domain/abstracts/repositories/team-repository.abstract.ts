@@ -1,5 +1,5 @@
 import { Team } from 'src/domain/entities';
-import { IGenericRepository } from './';
+import { IGenericRepository } from '.';
 
 export abstract class ITeamRepository implements IGenericRepository<Team> {
   abstract getAll(): Promise<Team[]>;

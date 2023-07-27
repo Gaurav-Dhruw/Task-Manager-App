@@ -6,25 +6,26 @@ import { IUserRepository } from 'src/domain/abstracts';
 
 @Injectable()
 export class UserRepository implements IUserRepository {
-  constructor(@InjectRepository(User) userRepository: Repository<User>) {}
+  constructor(
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
+  ) {}
 
   getByEmail(email: string): Promise<User> {
-    console.log('getByEmail Hit');
-    return;
-    // return new Promise(() => new User()).then(
-    //   (res) => ({ id: '12324' } as User),
-    // );
+    return this.userRepository.findOne({
+      where: { email },
+      relations: ['teams'],
+    });
   }
   getById(id: string): Promise<User> {
-    return;
+    return this.userRepository.findOneBy({ id });
   }
   getAll(): Promise<User[]> {
-    return;
+    return this.userRepository.find();
   }
-  create(item: User): Promise<User> {
-    return;
+  create(user: User): Promise<User> {
+    return this.userRepository.save(user);
   }
-  update(id: string, item: User): Promise<User> {
-    return;
+  update(id: string, user: User): Promise<User> {
+    return this.userRepository.save(user);
   }
 }

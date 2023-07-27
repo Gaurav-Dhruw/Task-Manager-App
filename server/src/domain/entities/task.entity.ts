@@ -11,4 +11,8 @@ export class Task {
   assigned_to: User[];
   team?: Team;
   reminder?: Reminder;
+
+  constructor(data?: Partial<Task>) {
+    Object.assign(this, data);
+  }
 }

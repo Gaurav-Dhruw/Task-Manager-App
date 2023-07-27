@@ -3,28 +3,29 @@ import {
   NestMiddleware,
   UnauthorizedException,
 } from '@nestjs/common';
-import { NextFunction, Request, Response } from 'express';
-import { IDataService, ITokenService } from 'src/domain/abstracts';
+import { NextFunction, Response } from 'express';
+import { ITokenService } from 'src/domain/abstracts';
+import { CustomRequest } from '../types';
 
 @Injectable()
 export class AuthMiddleware implements NestMiddleware {
-  constructor(
-    private readonly dataService: IDataService,
-    private readonly tokenService: ITokenService,
-  ) {}
+  constructor(private readonly tokenService: ITokenService) {}
 
-  async use(req: Request, res: Response, next: NextFunction) {
+  async use(req: CustomRequest, res: Response, next: NextFunction) {
     try {
-      const token = req.headers?.authorization?.split('')[1];
+      const token = req.headers?.authorization?.split(' ')[1];
       if (!token) throw new UnauthorizedException('Access Token Not Present');
-
+      // console.log(token);
       const user = this.tokenService.decodeToken(token);
+      // console.log(user);
       if (!user) throw new UnauthorizedException('Invalid Token');
+
       console.log('Auth Hit');
-      this.dataService.user.getById(user.id);
+
+      req.user = user;
       next();
     } catch (error) {
-      console.log('Auth Failed', error);
+      console.log('Auth Failed', error.message);
       return res.sendStatus(401);
     }
   }

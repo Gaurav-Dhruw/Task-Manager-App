@@ -18,20 +18,24 @@ export class Team {
   team_name: string;
 
   @Column({
-    nullable:true
+    nullable: true,
   })
   display_pic?: string;
 
-  @ManyToMany(() => User)
+  @ManyToMany(() => User, {
+    cascade: true,
+  })
   @JoinTable()
   admins: User[];
 
-  @ManyToMany(() => User, (user)=>user.teams)
+  @ManyToMany(() => User, (user) => user.teams, {
+    cascade: true,
+  })
   @JoinTable()
   members: User[];
 
-  @OneToMany(() => Task, (task) => task.team,{
-    nullable:true
+  @OneToMany(() => Task, (task) => task.team, {
+    nullable: true,
   })
   tasks?: Task[];
 }

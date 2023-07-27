@@ -6,4 +6,8 @@ export class Comment {
   created_at: Date;
   user: User;
   task: Task;
+
+  constructor(data?: Partial<Comment>) {
+    Object.assign(this, data);
+  }
 }

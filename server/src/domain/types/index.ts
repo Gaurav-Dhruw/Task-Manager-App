@@ -13,10 +13,10 @@ export enum Status {
   PastDeadline,
 }
 
-export interface OptionalUserInitializerData {
-  id?: string;
-  email?: string;
-  name?: string;
-  password?: string;
-  profile_pic?: string;
-}
+// export interface OptionalUserInitializerData {
+//   id?: string;
+//   email?: string;
+//   name?: string;
+//   password?: string;
+//   profile_pic?: string;
+// }

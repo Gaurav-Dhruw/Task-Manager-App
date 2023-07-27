@@ -1,6 +1,13 @@
-import { Reminder, Team } from "./";
-import {Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn} from 'typeorm'
-
+import { Reminder, Team } from './';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity()
 export class User {
@@ -8,7 +15,7 @@ export class User {
   id: string;
 
   @Column({
-    unique:true
+    unique: true,
   })
   email: string;
 
@@ -19,19 +26,17 @@ export class User {
   password: string;
 
   @Column({
-    nullable:true
+    nullable: true,
   })
   profile_pic: string;
 
-  @ManyToMany(() => Team,(team)=>team.members,{
-    nullable:true
+  @ManyToMany(() => Team, (team) => team.members, {
+    nullable: true,
   })
-  @JoinTable({})
   teams?: Team[];
 
-  @ManyToOne(() => Reminder, (reminder) => reminder.receivers,{
-    nullable:true,
+  @ManyToOne(() => Reminder, (reminder) => reminder.receivers, {
+    nullable: true,
   })
-  @JoinTable()
   reminders?: Reminder[];
 }
