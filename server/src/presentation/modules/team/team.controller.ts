@@ -34,27 +34,58 @@ export class TeamController {
   }
 
   @Patch('members/add')
-  addMemebers(@Body() teamDto: AddTeamMembersDto) {
-    return this.teamUseCases.addMembers(teamDto.id, teamDto.members);
+  addMemebers(@Req() req: CustomRequest, @Body() teamDto: AddTeamMembersDto) {
+    const requestedUser = new User(req.user);
+    return this.teamUseCases.addMembers(
+      teamDto.id,
+      teamDto.members,
+      requestedUser,
+    );
   }
 
   @Patch('members/remove')
-  removeMembers(@Body() teamDto: RemoveTeamMembersDto) {
-    return this.teamUseCases.removeMembers(teamDto.id, teamDto.members);
+  removeMembers(
+    @Req() req: CustomRequest,
+    @Body() teamDto: RemoveTeamMembersDto,
+  ) {
+    const requestedUser = new User(req.user);
+    return this.teamUseCases.removeMembers(
+      teamDto.id,
+      teamDto.members,
+      requestedUser,
+    );
   }
 
   @Patch('admins/add')
-  makeAdmins(@Body() teamDto: AddTeamAdminsDto) {
-    return this.teamUseCases.addAdmins(teamDto.id, teamDto.admins);
+  makeAdmins(@Req() req: CustomRequest, @Body() teamDto: AddTeamAdminsDto) {
+    const requestedUser = new User(req.user);
+    return this.teamUseCases.addAdmins(
+      teamDto.id,
+      teamDto.admins,
+      requestedUser,
+    );
   }
 
   @Patch('admins/remove')
-  removeAdmins(@Body() teamDto: RemoveTeamAdminsDto) {
-    return this.teamUseCases.removeAdmins(teamDto.id, teamDto.admins);
+  removeAdmins(
+    @Req() req: CustomRequest,
+    @Body() teamDto: RemoveTeamAdminsDto,
+  ) {
+    const requestedUser = new User(req.user);
+    return this.teamUseCases.removeAdmins(
+      teamDto.id,
+      teamDto.admins,
+      requestedUser,
+    );
   }
 
   @Delete('delete/:id')
-  deleteTeam(@Param('id', ParseUUIDPipe)  id: string) {
-    return this.teamUseCases.deleteTeam(id);
+  async deleteTeam(
+    @Req() req: CustomRequest,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) {
+    const requestedUser = new User(req.user);
+    await this.teamUseCases.deleteTeam(id, requestedUser);
+    return { message: `Team with id: ${id} deleted.` };
   }
 }

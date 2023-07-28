@@ -8,5 +8,5 @@ export abstract class INotificationRepository
   abstract getById(id: string): Promise<Notification>;
   abstract create(item: Notification): Promise<Notification>;
   abstract update(id: string, item: Notification): Promise<Notification>;
-  abstract delete(id: string): void;
+  abstract delete(id: string): Promise<void>;
 }

@@ -20,5 +20,7 @@ export class TaskRepository implements ITaskRepository {
   update(id: string, item: Task): Promise<Task> {
     return;
   }
-  delete(id: string): void {}
+  delete(id: string): Promise<void> {
+    return;
+  }
 }

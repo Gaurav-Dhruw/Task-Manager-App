@@ -7,20 +7,26 @@ import { InjectRepository } from '@nestjs/typeorm';
 @Injectable()
 export class CommentRepository implements ICommentRepository {
   constructor(
-    @InjectRepository(Comment) CommentRepository: Repository<Comment>,
+    @InjectRepository(Comment)
+    private readonly commentRepository: Repository<Comment>,
   ) {}
 
   getById(id: string): Promise<Comment> {
-    return;
+    return this.commentRepository.findOne({
+      where: { id },
+      relations: ['user', 'task'],
+    });
   }
   getAll(): Promise<Comment[]> {
-    return;
+    return this.commentRepository.find({ relations: ['user', 'task'] });
   }
-  create(item: Comment): Promise<Comment> {
-    return;
+  create(comment: Comment): Promise<Comment> {
+    return this.commentRepository.save(comment);
   }
-  update(id: string, item: Comment): Promise<Comment> {
-    return;
+  update(id: string, comment: Comment): Promise<Comment> {
+    return this.commentRepository.save(comment);
   }
-  delete(id: string): void {}
+  async delete(id: string): Promise<void> {
+    await this.commentRepository.delete(id);
+  }
 }

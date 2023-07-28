@@ -8,5 +8,5 @@ export abstract class ICommentRepository
   abstract getById(id: string): Promise<Comment>;
   abstract create(item: Comment): Promise<Comment>;
   abstract update(id: string, item: Comment): Promise<Comment>;
-  abstract delete(id: string): void;
+  abstract delete(id: string): Promise<void>;
 }

@@ -6,7 +6,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class NotificationRepository implements INotificationRepository {
-  constructor(@InjectRepository(Notification) NotificationRepository: Repository<Notification>) {}
+  constructor(
+    @InjectRepository(Notification)
+    NotificationRepository: Repository<Notification>,
+  ) {}
 
   getById(id: string): Promise<Notification> {
     return;
@@ -20,5 +23,5 @@ export class NotificationRepository implements INotificationRepository {
   update(id: string, item: Notification): Promise<Notification> {
     return;
   }
-  delete(id: string): void {}
+  delete(id: string): Promise<void>  {return;}
 }

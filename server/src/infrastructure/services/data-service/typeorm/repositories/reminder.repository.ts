@@ -6,7 +6,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class ReminderRepository implements IReminderRepository {
-  constructor(@InjectRepository(Reminder) ReminderRepository: Repository<Reminder>) {}
+  constructor(
+    @InjectRepository(Reminder) ReminderRepository: Repository<Reminder>,
+  ) {}
 
   getById(id: string): Promise<Reminder> {
     return;
@@ -20,5 +22,5 @@ export class ReminderRepository implements IReminderRepository {
   update(id: string, item: Reminder): Promise<Reminder> {
     return;
   }
-  delete(id: string): void {}
+  delete(id: string): Promise<void> { return}
 }
