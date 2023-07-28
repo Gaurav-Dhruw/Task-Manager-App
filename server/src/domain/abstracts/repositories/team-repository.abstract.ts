@@ -6,5 +6,5 @@ export abstract class ITeamRepository implements IGenericRepository<Team> {
   abstract getById(id: string): Promise<Team>;
   abstract create(item: Team): Promise<Team>;
   abstract update(id: string, item: Team): Promise<Team>;
-  abstract delete(id: string): void;
+  abstract delete(id: string): Promise<void>;
 }

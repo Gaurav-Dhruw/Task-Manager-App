@@ -1,12 +1,17 @@
-import { OmitType } from "@nestjs/mapped-types";
-import { IsNotEmpty, IsString } from "class-validator";
+
+import { IsNotEmpty, IsOptional, IsString } from "class-validator";
 import { Team, User } from "src/domain/entities";
 
 
 export class CreateTeamDto {
-    @IsString()
-    @IsNotEmpty()
-    team_name: string;
+  @IsString()
+  @IsNotEmpty()
+  team_name: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @IsOptional()
+  display_pic?: string;
 }
 
 export class CreateTeamResponseDto {
