@@ -1,6 +1,6 @@
-import { User } from "src/domain/entities";
+import { User } from 'src/domain/entities';
 
 export abstract class ITokenService {
-  abstract generateToken(data: Partial<User>): string;
-  abstract decodeToken(token: string): Partial<User> | undefined;
+  abstract generateToken(data: Pick<User, 'id' | 'email'>): string;
+  abstract decodeToken(token: string): Pick<User, 'id' | 'email'> | undefined;
 }

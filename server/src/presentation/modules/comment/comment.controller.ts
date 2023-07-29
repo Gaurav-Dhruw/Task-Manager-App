@@ -34,16 +34,15 @@ export class CommentController {
     @Body() commentDto: UpdateCommentDto,
   ) {
     const comment = new Comment(commentDto);
-    comment.user = new User(req.user);
+    const requestUser = new User(req.user);
 
-    return this.commentUseCases.updateComment(comment);
+    return this.commentUseCases.updateComment( comment, requestUser);
   }
 
-  @Delete('create')
+  @Delete(':id')
   async deleteComment(@Req() req: CustomRequest, @Param('id', ParseUUIDPipe) id: string) {
-    const comment = new Comment({ id });
-    comment.user = new User(req.user);
+    const requestUser = new User(req.user);
 
-    await this.commentUseCases.deleteComment(comment);
+    await this.commentUseCases.deleteComment(id, requestUser);
   }
 }

@@ -10,24 +10,36 @@ export class TeamUseCases {
     private readonly helper: TeamUseCasesHelper,
   ) {}
 
-  getAllTeams(): Promise<Team[]> {
-    return this.dataService.team.getAll();
+  // getAllTeams(): Promise<Team[]> {
+  //   return this.dataService.team.getAll();
+  // }
+
+  async getTeam(id:string): Promise<Team> {
+    const team = await this.dataService.team.getById(id);
+    if(!team) throw new NotFoundException('Team Not Found');
+
+    return team;
   }
-  createTeam(teamInput: Team, teamCreator: User): Promise<Team> {
-    teamInput.admins = [teamCreator];
-    teamInput.members = [teamCreator];
+
+  getTeamsWhereUser(user_id: string): Promise<Team[]> {
+    return this.dataService.team.getAllWhereUser(user_id);
+  }
+  async createTeam(teamInput: Team, requestUser: User): Promise<Team> {
+    teamInput.admins = [requestUser];
+    teamInput.members = [requestUser];
+
     return this.dataService.team.create(teamInput);
   }
 
   async addMembers(
     id: string,
     newMembers: User[],
-    requestedUser: User,
+    requestUser: User,
   ): Promise<Team> {
     const team = await this.dataService.team.getById(id);
-    if (!team) throw new NotFoundException('Team Not Found');
-    this.helper.checkAuthorization(team, requestedUser);
-    this.helper.checkAdminAccess(team, requestedUser);
+
+    this.helper.validateOperation(team, requestUser);
+    this.helper.checkAdminAccess(team, requestUser);
 
     team.members = this.helper.mergeUsersList(team.members, newMembers);
 
@@ -36,16 +48,16 @@ export class TeamUseCases {
 
   async removeMembers(
     id: string,
-    membersToBeRemoved: User[],
-    requestedUser: User,
+    removalList: User[],
+    requestUser: User,
   ): Promise<Team> {
     const team = await this.dataService.team.getById(id);
-    if (!team) throw new NotFoundException('Team Not Found');
-    this.helper.checkAuthorization(team, requestedUser);
-    this.helper.checkAdminAccess(team, requestedUser);
 
-    team.members = this.helper.filterUsers(team, membersToBeRemoved, 'members');
-    team.admins = this.helper.filterUsers(team, membersToBeRemoved, 'admins');
+    this.helper.validateOperation(team, requestUser);
+    this.helper.checkAdminAccess(team, requestUser);
+
+    team.members = this.helper.filterUsers(team.members, removalList);
+    team.admins = this.helper.filterUsers(team.admins, removalList);
 
     return this.dataService.team.update(team.id, team);
   }
@@ -53,12 +65,11 @@ export class TeamUseCases {
   async addAdmins(
     id: string,
     newAdmins: User[],
-    requestedUser: User,
+    requestUser: User,
   ): Promise<Team> {
     const team = await this.dataService.team.getById(id);
-    if (!team) throw new NotFoundException('Team Not Found');
-    this.helper.checkAuthorization(team, requestedUser);
-    this.helper.checkAdminAccess(team, requestedUser);
+    this.helper.validateOperation(team, requestUser);
+    this.helper.checkAdminAccess(team, requestUser);
     this.helper.areTeamMembers(team, newAdmins);
 
     team.admins = this.helper.mergeUsersList(team.admins, newAdmins);
@@ -68,24 +79,23 @@ export class TeamUseCases {
 
   async removeAdmins(
     id: string,
-    adminsToBeRemoved: User[],
-    requestedUser: User,
+    removalList: User[],
+    requestUser: User,
   ): Promise<Team> {
     const team = await this.dataService.team.getById(id);
-    if (!team) throw new NotFoundException('Team Not Found');
-    this.helper.checkAuthorization(team, requestedUser);
-    this.helper.checkAdminAccess(team, requestedUser);
+    this.helper.validateOperation(team, requestUser);
+    this.helper.checkAdminAccess(team, requestUser);
 
-    team.admins = this.helper.filterUsers(team, adminsToBeRemoved, 'admins');
+    team.admins = this.helper.filterUsers(team.admins, removalList);
 
     return this.dataService.team.update(team.id, team);
   }
 
-  async deleteTeam(id: string, requestedUser: User): Promise<void> {
+  async deleteTeam(id: string, requestUser: User): Promise<void> {
     const team = await this.dataService.team.getById(id);
-    if (!team) throw new NotFoundException('Team Not Found');
-    this.helper.checkAuthorization(team, requestedUser);
-    this.helper.checkAdminAccess(team, requestedUser);
+
+    this.helper.validateOperation(team, requestUser);
+    this.helper.checkAdminAccess(team, requestUser);
 
     await this.dataService.team.delete(team.id);
   }

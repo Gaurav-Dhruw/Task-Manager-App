@@ -1,5 +1,5 @@
 import { Priority, Status } from '../types';
-import { Reminder, Team, User } from './';
+import { Comment, Reminder, Team, User } from './';
 
 export class Task {
   id: string;
@@ -10,6 +10,7 @@ export class Task {
   created_by: User;
   assigned_to: User[];
   team?: Team;
+  comments?:Comment[];
   reminder?: Reminder;
 
   constructor(data?: Partial<Task>) {

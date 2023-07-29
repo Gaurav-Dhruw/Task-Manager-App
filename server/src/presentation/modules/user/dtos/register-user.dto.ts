@@ -5,7 +5,7 @@ import {
   MinLength,
   IsStrongPassword,
 } from 'class-validator';
-
+import { User } from 'src/domain/entities';
 export class RegisterUserDto {
   @IsEmail()
   @IsNotEmpty()
@@ -20,4 +20,16 @@ export class RegisterUserDto {
   @IsString()
   @IsNotEmpty()
   password: string;
+}
+
+export class RegisterUserResponseDto {
+  id: string;
+  email: string;
+  name: string;
+  profile_pic?: string;
+  token: string;
+
+  constructor(data?: Partial<User> & { token?: string }) {
+    Object.assign(this, data);
+  }
 }

@@ -2,26 +2,20 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
+import { NotFoundError } from 'rxjs';
 import { IDataService } from 'src/domain/abstracts';
 import { Team, User } from 'src/domain/entities';
 
 @Injectable()
 export class TeamUseCasesHelper {
-  constructor(private readonly dataservice: IDataService) {}
-
-  filterUsers(
-    team: Team,
-    users: User[],
-    memberType: 'admins' | 'members',
-  ): User[] {
-    return team[memberType].filter((curr) => {
-      for (let i = 0; i < users.length; i++) {
-        if (users[i].id === curr.id) return false;
-      }
-      return true;
-    });
+  filterUsers(currList: User[], filterList: User[]): User[] {
+    const filteredList = currList.filter(
+      (curr) => !filterList.find((user) => user?.id === curr.id),
+    );
+    return filteredList;
   }
 
   mergeUsersList(oldList: User[], newList: User[]): User[] {
@@ -30,7 +24,6 @@ export class TeamUseCasesHelper {
       if (!user.id) return false;
       return idx === self.findIndex((curr) => curr.id === user.id);
     });
-    // console.log(oldList, newList, updatedList);
     return updatedList;
   }
 
@@ -41,11 +34,9 @@ export class TeamUseCasesHelper {
       const userFound = team.admins.find(
         (admin) => admin.id === requestedUser.id,
       );
-
       if (!userFound) break conditionCheck;
       return;
     }
-
     throw new ForbiddenException('Admin access required');
   }
 
@@ -60,12 +51,24 @@ export class TeamUseCasesHelper {
       throw new BadRequestException('Users must be team members');
   }
 
-  checkAuthorization(team: Team, requestedUser: User): void {
-    const members = team.members;
-    const isAuthorized = members.find(
-      (member) => member.id === requestedUser?.id,
-    );
+  // checkAuthorization(team: Team, requestedUser: User): void {
+  //   const members = team.members;
+  //   const isAuthorized = members.find(
+  //     (member) => member.id === requestedUser?.id,
+  //   );
 
-    if (!isAuthorized) throw new UnauthorizedException('User Unauthorized');
+  //   if (!isAuthorized) throw new UnauthorizedException('User Unauthorized');
+  // }
+
+  validateOperation(team: Team, user: User): void {
+    const errMsgs: string[] = [];
+    if (!user) errMsgs.push('User Not Found');
+    if (!team) errMsgs.push('Team Not Found');
+
+    if (errMsgs.length > 0) throw new NotFoundException(errMsgs);
   }
+
+  // validateRequestUser(user: User): void {
+  //   if (!user) throw new NotFoundException('User Not Found');
+  // }
 }

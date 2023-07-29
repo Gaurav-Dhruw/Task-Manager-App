@@ -1,5 +1,5 @@
 import { Priority, Status } from 'src/domain/types';
-import { Reminder, Team, User } from './';
+import { Reminder, Team, User, Comment } from './';
 import {
   Column,
   Entity,
@@ -7,6 +7,7 @@ import {
   JoinTable,
   ManyToMany,
   ManyToOne,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -43,6 +44,9 @@ export class Task {
     nullable:true
   })
   team?: Team;
+
+  @OneToMany(()=>Comment, (comment)=>comment.task,{nullable:true})
+  comments?:Comment[];
 
   @OneToOne(() => Reminder, (reminder) => reminder.task,{
     nullable:true

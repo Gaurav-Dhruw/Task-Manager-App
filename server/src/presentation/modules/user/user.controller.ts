@@ -2,8 +2,6 @@ import {
   BadRequestException,
   Body,
   Controller,
-  Inject,
-  NotFoundException,
   Patch,
   Post,
   Req,
@@ -15,12 +13,10 @@ import {
   LoginUserResponseDto,
   RegisterUserDto,
   RegisterUserResponseDto,
+  UpdateUserDto,
+  UpdateUserCredentialsDto,
 } from './dtos';
 import { UserUseCases } from 'src/application/use-cases/user/user.use-cases';
-import {
-  UpdateUserCredentialsDto,
-  UpdateUserDto,
-} from './dtos/update-user.dto';
 import { ITokenService } from 'src/domain/abstracts';
 import { CustomRequest } from 'src/presentation/common/types';
 
@@ -67,6 +63,11 @@ export class UserController {
     @Body() user: UpdateUserCredentialsDto,
   ): Promise<void> {
     return;
+  }
+
+  @Post('find-by-ids')
+  findUsersByIds(@Body('users') users: string[]) {
+    return this.userUserCases.getUsersByIds(users);
   }
 
   isEmptyObject(obj: object): boolean {

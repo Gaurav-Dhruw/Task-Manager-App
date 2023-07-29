@@ -1,26 +1,33 @@
 import { Reminder } from '../entities';
 import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { IReminderRepository } from 'src/domain/abstracts';
 import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class ReminderRepository implements IReminderRepository {
   constructor(
-    @InjectRepository(Reminder) ReminderRepository: Repository<Reminder>,
+    @InjectRepository(Reminder)
+    private readonly reminderRepository: Repository<Reminder>,
   ) {}
 
   getById(id: string): Promise<Reminder> {
-    return;
+    return this.reminderRepository.findOne({
+      where: { id },
+      relations: ['receivers', 'task'],
+    });
   }
+
   getAll(): Promise<Reminder[]> {
-    return;
+    return this.reminderRepository.find({ relations: ['receivers', 'task'] });
   }
-  create(item: Reminder): Promise<Reminder> {
-    return;
+  create(reminder: Reminder): Promise<Reminder> {
+    return this.reminderRepository.save(reminder);
   }
-  update(id: string, item: Reminder): Promise<Reminder> {
-    return;
+  update(id: string, reminder: Reminder): Promise<Reminder> {
+    return this.reminderRepository.save(reminder);
   }
-  delete(id: string): Promise<void> { return}
+  async delete(id: string): Promise<void> {
+    await this.reminderRepository.delete(id);
+  }
 }

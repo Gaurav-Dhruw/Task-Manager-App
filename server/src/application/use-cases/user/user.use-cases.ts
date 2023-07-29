@@ -4,10 +4,7 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import {
-  IDataService,
-  IHashService,
-} from 'src/domain/abstracts';
+import { IDataService, IHashService } from 'src/domain/abstracts';
 import { User } from 'src/domain/entities';
 
 @Injectable()
@@ -41,5 +38,9 @@ export class UserUseCases {
   async updateUser(inputUser: User): Promise<User> {
     console.log('Update User Hit');
     return this.dataService.user.update(inputUser.id, inputUser);
+  }
+
+  getUsersByIds(usersInput: string[]): Promise<User[]> {
+    return this.dataService.user.getByIds(usersInput);
   }
 }

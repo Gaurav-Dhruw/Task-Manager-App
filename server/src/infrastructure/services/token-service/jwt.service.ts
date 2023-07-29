@@ -13,7 +13,7 @@ export class JwtService implements ITokenService {
     this.secretKey = process.env.SECRET_TOKEN_KEY;
   }
 
-  generateToken(data: Partial<User>): string {
+  generateToken(data: Pick<User, 'id' | 'email'>): string {
     const payload = {
       id: data.id,
       email: data.email,
@@ -22,15 +22,20 @@ export class JwtService implements ITokenService {
     return this.jwt.sign(payload, this.secretKey);
   }
 
-  decodeToken(token: string): Partial<User> | undefined {
-    const decoded = this.jwt.verify(token, this.secretKey);
+  decodeToken(token: string): Pick<User,'id' | 'email'> | undefined {
+    try{
 
-    if (this.isJwtPayload(decoded)) {
-      const user = new User();
-      user.id = decoded.id;
-      user.email = decoded.email;
-
-      return user;
+      const decoded = this.jwt.verify(token, this.secretKey);
+      
+      if (this.isJwtPayload(decoded)) {
+        const user = new User();
+        user.id = decoded.id;
+        user.email = decoded.email;
+        
+        return user;
+      }
+    }catch{
+      return;
     }
   }
 

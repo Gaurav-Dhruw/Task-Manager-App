@@ -6,10 +6,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class TaskRepository implements ITaskRepository {
-  constructor(@InjectRepository(Task) TaskRepository: Repository<Task>) {}
+  constructor(@InjectRepository(Task) private readonly taskRepository: Repository<Task>) {}
 
   getById(id: string): Promise<Task> {
-    return;
+    return this.taskRepository.findOne({where:{id},relations:['assigned_to','created_by','team','comments']});
   }
   getAll(): Promise<Task[]> {
     return;

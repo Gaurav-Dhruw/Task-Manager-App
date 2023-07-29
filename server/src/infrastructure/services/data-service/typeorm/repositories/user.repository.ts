@@ -1,7 +1,7 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../entities';
 import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { IUserRepository } from 'src/domain/abstracts';
 
 @Injectable()
@@ -18,6 +18,12 @@ export class UserRepository implements IUserRepository {
   }
   getById(id: string): Promise<User> {
     return this.userRepository.findOneBy({ id });
+  }
+
+  getByIds(ids: string[]): Promise<User[]> {
+    return this.userRepository.findBy({
+      id: In(ids),
+    });
   }
   getAll(): Promise<User[]> {
     return this.userRepository.find();

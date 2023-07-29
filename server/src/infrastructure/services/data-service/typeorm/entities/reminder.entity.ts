@@ -1,6 +1,7 @@
 import {
   Column,
   Entity,
+  JoinColumn,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -11,6 +12,10 @@ import { Task, User } from './';
 export class Reminder {
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  @OneToOne(()=>User)
+  @JoinColumn()
+  created_by: User;
 
   @OneToMany(() => User, (user) => user.reminders)
   receivers: User[];

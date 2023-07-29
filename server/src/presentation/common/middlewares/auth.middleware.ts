@@ -18,15 +18,15 @@ export class AuthMiddleware implements NestMiddleware {
       // console.log(token);
       const user = this.tokenService.decodeToken(token);
       // console.log(user);
-      if (!user) throw new UnauthorizedException('Invalid Token');
+      if (!user || !user.id) throw new UnauthorizedException('Invalid Token');
 
       console.log('Auth Hit');
 
       req.user = user;
       next();
     } catch (error) {
-      console.log('Auth Failed', error.message);
-      return res.sendStatus(401);
+      console.log('Auth Failed: ', error.message);
+      return res.status(error.status).json(error.response);
     }
   }
 }

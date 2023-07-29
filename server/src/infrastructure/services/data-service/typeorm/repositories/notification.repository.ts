@@ -8,20 +8,44 @@ import { InjectRepository } from '@nestjs/typeorm';
 export class NotificationRepository implements INotificationRepository {
   constructor(
     @InjectRepository(Notification)
-    NotificationRepository: Repository<Notification>,
+    private readonly notificationRepository: Repository<Notification>,
   ) {}
 
   getById(id: string): Promise<Notification> {
-    return;
+    return this.notificationRepository.findOne({
+      where: { id },
+      relations: ['receiver'],
+    });
   }
   getAll(): Promise<Notification[]> {
-    return;
+    return this.notificationRepository.find({ relations: ['receiver'] });
   }
-  create(item: Notification): Promise<Notification> {
-    return;
+
+  getAllWhereUser(
+    user_id: string,
+    paginationOption?: { skip: number },
+  ): Promise<Notification[]> {
+    return this.notificationRepository.find({
+      where: {
+        receiver: { id: user_id },
+      },
+      relations: ['receiver'],
+    });
   }
-  update(id: string, item: Notification): Promise<Notification> {
-    return;
+
+  create(notification: Notification): Promise<Notification> {
+    return this.notificationRepository.save(notification);
   }
-  delete(id: string): Promise<void>  {return;}
+
+  update(id: string, notification: Notification): Promise<Notification> {
+    return this.notificationRepository.save(notification);
+  }
+
+  updateAll(notifications: Notification[]): Promise<Notification[]> {
+    return this.notificationRepository.save(notifications);
+  }
+
+  async delete(id: string): Promise<void> {
+    await this.notificationRepository.delete(id);
+  }
 }
