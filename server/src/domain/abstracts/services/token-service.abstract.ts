@@ -1,6 +1,7 @@
 import { User } from 'src/domain/entities';
+import { TokenPayload } from 'src/domain/types';
 
 export abstract class ITokenService {
-  abstract generateToken(data: Pick<User, 'id' | 'email'>): string;
-  abstract decodeToken(token: string): Pick<User, 'id' | 'email'> | undefined;
+  abstract generateToken(data: User): string;
+  abstract decodeToken(token: string): TokenPayload | undefined;
 }

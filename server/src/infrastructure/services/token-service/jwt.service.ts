@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
 import { ITokenService } from 'src/domain/abstracts';
 import { User } from 'src/domain/entities';
+import { TokenPayload } from 'src/domain/types';
 
 @Injectable()
 export class JwtService implements ITokenService {
@@ -13,7 +14,7 @@ export class JwtService implements ITokenService {
     this.secretKey = process.env.SECRET_TOKEN_KEY;
   }
 
-  generateToken(data: Pick<User, 'id' | 'email'>): string {
+  generateToken(data: User): string {
     const payload = {
       id: data.id,
       email: data.email,
@@ -22,7 +23,7 @@ export class JwtService implements ITokenService {
     return this.jwt.sign(payload, this.secretKey);
   }
 
-  decodeToken(token: string): Pick<User,'id' | 'email'> | undefined {
+  decodeToken(token: string): TokenPayload| undefined {
     try{
 
       const decoded = this.jwt.verify(token, this.secretKey);

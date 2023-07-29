@@ -1,4 +1,4 @@
-import { Team } from "../entities";
+import { Team, User } from "../entities";
 
 export enum Priority {
   Low,
@@ -13,10 +13,4 @@ export enum Status {
   PastDeadline,
 }
 
-// export interface OptionalUserInitializerData {
-//   id?: string;
-//   email?: string;
-//   name?: string;
-//   password?: string;
-//   profile_pic?: string;
-// }
+export interface TokenPayload extends Pick<User, 'id' | 'email'>{}
