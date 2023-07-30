@@ -5,6 +5,7 @@ import {
   Patch,
   Post,
   Req,
+  UsePipes,
 } from '@nestjs/common';
 
 import { User } from 'src/domain/entities';
@@ -19,6 +20,7 @@ import {
 import { UserUseCases } from 'src/application/use-cases/user/user.use-cases';
 import { ITokenService } from 'src/domain/abstracts';
 import { CustomRequest } from 'src/presentation/common/types';
+import { UpdateUserDtoValidationPipe } from './pipes';
 
 @Controller('user')
 export class UserController {
@@ -31,11 +33,11 @@ export class UserController {
   async loginUser(
     @Body() userDto: LoginUserDto,
   ): Promise<LoginUserResponseDto> {
-    const user = new User(userDto);
-    const userDetails = await this.userUserCases.loginUser(user);
-    const token = this.tokenService.generateToken(userDetails);
-    console.log(userDetails);
-    return new LoginUserResponseDto({ ...userDetails, token });
+    const userInput = new User(userDto);
+    const user = await this.userUserCases.loginUser(userInput);
+    const token = this.tokenService.generateToken(user);
+  
+    return new LoginUserResponseDto({ ...user, token });
   }
 
   @Post('sign-up')
@@ -49,13 +51,12 @@ export class UserController {
     return new RegisterUserResponseDto({ ...registeredUser, token });
   }
 
+  @UsePipes(new UpdateUserDtoValidationPipe())
   @Patch('update')
   async updateUser(@Req() req: CustomRequest, @Body() userDto: UpdateUserDto) {
-    if (this.isEmptyObject(userDto) || this.hasNullValues(userDto))
-      throw new BadRequestException();
-
-    const user = new User({ ...req.user, ...userDto });
-    return this.userUserCases.updateUser(user);
+    const inputUser = new User(userDto);
+    const requestUser = new User(req.user);
+    return this.userUserCases.updateUser(inputUser, requestUser);
   }
 
   @Patch('update/credentials')
@@ -65,19 +66,9 @@ export class UserController {
     return;
   }
 
-  @Post('find-by-ids')
-  findUsersByIds(@Body('users') users: string[]) {
-    return this.userUserCases.getUsersByIds(users);
-  }
+  // @Post('find-by-ids')
+  // findUsersByIds(@Body('users') users: User[]) {
+  //   return this.userUserCases.getUsersByIds(users);
+  // }
 
-  isEmptyObject(obj: object): boolean {
-    return Object.keys(obj).length === 0;
-  }
-
-  hasNullValues(obj: object): boolean {
-    for (const key in obj) {
-      if (obj[key] === null) return true;
-    }
-    return false;
-  }
 }

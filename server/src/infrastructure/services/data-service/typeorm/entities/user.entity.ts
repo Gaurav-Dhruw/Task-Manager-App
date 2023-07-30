@@ -2,8 +2,6 @@ import { Reminder, Team } from './';
 import {
   Column,
   Entity,
-  JoinColumn,
-  JoinTable,
   ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,

@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
   Req,
+  UsePipes,
 } from '@nestjs/common';
 import { TeamUseCases } from 'src/application/use-cases/team/team.use-cases';
 import { Team, User } from 'src/domain/entities';
@@ -15,10 +16,11 @@ import {
   AddTeamAdminsDto,
   AddTeamMembersDto,
   CreateTeamDto,
-  RemoveTeamAdminsDto,
   RemoveTeamMembersDto,
+  UpdateTeamDto,
 } from './dtos';
 import { CustomRequest } from 'src/presentation/common/types';
+import { UpdateTeamDtoValidationPipe } from './pipes';
 
 @Controller('team')
 export class TeamController {
@@ -30,12 +32,13 @@ export class TeamController {
   // }
 
   @Get(':id')
-  getTeam(@Req() req: CustomRequest, @Param('id', ParseUUIDPipe) id:string) {
-    return this.teamUseCases.getTeam(id);
+  findTeam(@Req() req: CustomRequest, @Param('id', ParseUUIDPipe) id: string) {
+    const requestUser = new User(req.user);
+    return this.teamUseCases.getTeam(id, requestUser);
   }
 
   @Get()
-  getTeams(@Req() req: CustomRequest) {
+  findTeams(@Req() req: CustomRequest) {
     return this.teamUseCases.getTeamsWhereUser(req.user?.id);
   }
 
@@ -44,6 +47,14 @@ export class TeamController {
     const team = new Team(teamDto);
     const requestUser = new User(req.user);
     return this.teamUseCases.createTeam(team, requestUser);
+  }
+
+  @UsePipes(UpdateTeamDtoValidationPipe)
+  @Patch('update')
+  async updateTeam(@Req() req: CustomRequest, @Body() teamDto: UpdateTeamDto) {
+    const team = new Team(teamDto);
+    const requestUser = new User(req.user);
+    return this.teamUseCases.updateTeam(team, requestUser);
   }
 
   @Patch('members/add')
@@ -70,31 +81,31 @@ export class TeamController {
   }
 
   @Patch('admins/add')
-  makeAdmins(@Req() req: CustomRequest, @Body() teamDto: AddTeamAdminsDto) {
+  makeAdmin(@Req() req: CustomRequest, @Body() teamDto: AddTeamAdminsDto) {
     const requestUser = new User(req.user);
-    return this.teamUseCases.addAdmins(teamDto.id, teamDto.admins, requestUser);
+    return this.teamUseCases.makeAdmin(teamDto.id, teamDto.admins, requestUser);
   }
 
-  @Patch('admins/remove')
-  removeAdmins(
-    @Req() req: CustomRequest,
-    @Body() teamDto: RemoveTeamAdminsDto,
-  ) {
-    const requestUser = new User(req.user);
-    return this.teamUseCases.removeAdmins(
-      teamDto.id,
-      teamDto.admins,
-      requestUser,
-    );
-  }
+  // @Patch('admins/remove')
+  // removeAdmins(
+  //   @Req() req: CustomRequest,
+  //   @Body() teamDto: RemoveTeamAdminsDto,
+  // ) {
+  //   const requestUser = new User(req.user);
+  //   return this.teamUseCases.removeAdmins(
+  //     teamDto.id,
+  //     teamDto.admins,
+  //     requestUser,
+  //   );
+  // }
 
-  @Delete('delete/:id')
-  async deleteTeam(
-    @Req() req: CustomRequest,
-    @Param('id', ParseUUIDPipe) id: string,
-  ): Promise<void> {
-    const requestUser = new User(req.user);
-    await this.teamUseCases.deleteTeam(id, requestUser);
-    return;
-  }
+  // @Delete('delete/:id')
+  // async deleteTeam(
+  //   @Req() req: CustomRequest,
+  //   @Param('id', ParseUUIDPipe) id: string,
+  // ): Promise<void> {
+  //   const requestUser = new User(req.user);
+  //   await this.teamUseCases.deleteTeam(id, requestUser);
+  //   return;
+  // }
 }

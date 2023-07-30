@@ -19,23 +19,20 @@ export class JwtService implements ITokenService {
       id: data.id,
       email: data.email,
     };
-    
+
     return this.jwt.sign(payload, this.secretKey);
   }
 
-  decodeToken(token: string): TokenPayload| undefined {
-    try{
-
+  decodeToken(token: string): TokenPayload | undefined {
+    try {
       const decoded = this.jwt.verify(token, this.secretKey);
-      
+
       if (this.isJwtPayload(decoded)) {
-        const user = new User();
-        user.id = decoded.id;
-        user.email = decoded.email;
-        
-        return user;
+        const {id, email} = (decoded as TokenPayload);
+
+        return { id, email };
       }
-    }catch{
+    } catch {
       return;
     }
   }

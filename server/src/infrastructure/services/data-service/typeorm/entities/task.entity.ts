@@ -12,7 +12,6 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-
 @Entity()
 export class Task {
   @PrimaryGeneratedColumn('uuid')
@@ -22,17 +21,20 @@ export class Task {
   title: string;
 
   @Column({
-    nullable:true
+    nullable: true,
   })
   description?: string;
+
+  @Column({ nullable: true })
+  deadline?: Date;
 
   @Column({ type: 'enum', enum: Status, default: Status.Unfinished })
   status: Status;
 
-  @Column({ type: 'enum', enum: Priority, nullable:true})
+  @Column({ type: 'enum', enum: Priority, nullable: true })
   priority?: Priority;
 
-  @OneToOne(() => User)
+  @ManyToOne(() => User)
   @JoinColumn()
   created_by: User;
 
@@ -41,15 +43,15 @@ export class Task {
   assigned_to: User[];
 
   @ManyToOne(() => Team, (team) => team.tasks, {
-    nullable:true
+    nullable: true,
   })
   team?: Team;
 
-  @OneToMany(()=>Comment, (comment)=>comment.task,{nullable:true})
-  comments?:Comment[];
+  @OneToMany(() => Comment, (comment) => comment.task, { nullable: true })
+  comments?: Comment[];
 
-  @OneToOne(() => Reminder, (reminder) => reminder.task,{
-    nullable:true
+  @OneToOne(() => Reminder, (reminder) => reminder.task, {
+    nullable: true,
   })
   @JoinColumn()
   reminder?: Reminder;

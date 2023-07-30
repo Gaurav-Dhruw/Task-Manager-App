@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsUUID } from 'class-validator';
 
-export class GenericEntityDTO {
+export class GenericEntityDto {
   @IsUUID()
   @IsNotEmpty()
   id: string;

@@ -5,12 +5,13 @@ export class Task {
   id: string;
   title: string;
   description?: string;
+  deadline?: Date;
   status: Status;
   priority?: Priority;
   created_by: User;
   assigned_to: User[];
   team?: Team;
-  comments?:Comment[];
+  comments?: Comment[];
   reminder?: Reminder;
 
   constructor(data?: Partial<Task>) {

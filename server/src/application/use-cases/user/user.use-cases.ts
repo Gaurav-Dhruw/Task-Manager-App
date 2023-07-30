@@ -6,12 +6,14 @@ import {
 } from '@nestjs/common';
 import { IDataService, IHashService } from 'src/domain/abstracts';
 import { User } from 'src/domain/entities';
+import { UserCasesHelper } from './user-use-cases.helper';
 
 @Injectable()
 export class UserUseCases {
   constructor(
     private readonly dataService: IDataService,
     private readonly hashService: IHashService,
+    private readonly helper: UserCasesHelper
   ) {}
 
   async loginUser(inputUser: User): Promise<User> {
@@ -24,23 +26,21 @@ export class UserUseCases {
   }
 
   async registerUser(inputUser: User): Promise<User> {
-    const isAlreadyRegistered =
-      (await this.dataService.user.getByEmail(inputUser.email)) !== null;
-    if (isAlreadyRegistered)
-      throw new BadRequestException('Email Already Registered');
+    const user = await this.dataService.user.getByEmail(inputUser.email);
+    if (user) throw new BadRequestException('Email Already Registered');
 
     inputUser.password = this.hashService.hash(inputUser.password);
-    const registeredUser = await this.dataService.user.create(inputUser);
-    console.log(registeredUser);
-    return registeredUser;
+    return this.dataService.user.create(inputUser);
   }
 
-  async updateUser(inputUser: User): Promise<User> {
-    console.log('Update User Hit');
+  async updateUser(inputUser: User, requestUser:User): Promise<User> {
+    const user = await this.dataService.user.getById(inputUser?.id);
+    this.helper.validateMutateOperation(user, requestUser);
     return this.dataService.user.update(inputUser.id, inputUser);
   }
 
-  getUsersByIds(usersInput: string[]): Promise<User[]> {
-    return this.dataService.user.getByIds(usersInput);
+  getUsersByIds(users: User[]): Promise<User[]> {
+    const users_ids = users.map((user)=> user.id);
+    return this.dataService.user.getByIds(users_ids);
   }
 }

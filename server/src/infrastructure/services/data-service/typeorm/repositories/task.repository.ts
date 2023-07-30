@@ -6,21 +6,32 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class TaskRepository implements ITaskRepository {
-  constructor(@InjectRepository(Task) private readonly taskRepository: Repository<Task>) {}
+  constructor(
+    @InjectRepository(Task) private readonly taskRepository: Repository<Task>,
+  ) {}
 
   getById(id: string): Promise<Task> {
-    return this.taskRepository.findOne({where:{id},relations:['assigned_to','created_by','team','comments']});
+    return this.taskRepository.findOne({
+      where: { id },
+      relations: ['assigned_to', 'created_by', 'team', 'comments'],
+    });
   }
   getAll(): Promise<Task[]> {
-    return;
+    return this.taskRepository.find();
   }
-  create(item: Task): Promise<Task> {
-    return;
+  
+  getAllWhereUser(user_id: string): Promise<Task[]> {
+    return this.taskRepository.find({
+      where: { assigned_to: { id: user_id } },
+    });
   }
-  update(id: string, item: Task): Promise<Task> {
-    return;
+  create(task: Task): Promise<Task> {
+    return this.taskRepository.save(task);
   }
-  delete(id: string): Promise<void> {
-    return;
+  update(id: string, task: Task): Promise<Task> {
+    return this.taskRepository.save(task);
+  }
+  async delete(id: string): Promise<void> {
+    await this.taskRepository.delete(id);
   }
 }
