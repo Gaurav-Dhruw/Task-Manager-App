@@ -1,10 +1,10 @@
-import { Module } from "@nestjs/common";
-import { UserUseCases } from "./user.use-cases";
-import { UserCasesHelper } from "./user-use-cases.helper";
-
+import { Module } from '@nestjs/common';
+import { UserUseCases } from './user.use-cases';
+import { UserCasesHelperModule } from './helpers/user-use-cases-helper.module';
 
 @Module({
-    providers:[UserUseCases, UserCasesHelper],
-    exports:[UserUseCases],
+  imports:[UserCasesHelperModule],
+  providers: [UserUseCases],
+  exports: [UserUseCases],
 })
-export class UserUseCasesModule{}
+export class UserUseCasesModule {}

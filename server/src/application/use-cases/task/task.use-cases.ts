@@ -4,30 +4,34 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { IDataService } from 'src/domain/abstracts';
-import { Task, User } from 'src/domain/entities';
-import { TaskUseCasesHelper } from './task-use-cases.helper';
-import { CommonUseCasesHelper } from 'src/application/helpers/use-cases.helper';
+import { Task, Team, User } from 'src/domain/entities';
+import { TaskUseCasesHelper } from './helpers/task-use-cases.helper';
 
 @Injectable()
 export class TaskUseCases {
   constructor(
     private readonly dataService: IDataService,
-    private readonly commonHelper: CommonUseCasesHelper,
     private readonly helper: TaskUseCasesHelper,
   ) {}
 
   // Done
   async createTask(inputTask: Task, requestUser: User): Promise<Task> {
-    const team = inputTask?.team?.id
-      ? await this.dataService.team.getById(inputTask.team.id)
-      : null;
+    const inputTeam = inputTask?.team;
 
-    this.helper.validateCreateOperation(inputTask.team, team);
-    this.helper.checkCreateAuthorization(team, requestUser);
+    // If not a team task, then assign it to creator itself
+    if (!inputTeam) {
+      inputTask.assigned_to = [requestUser];
+    }
+    // If trying to create a team task.
+    else {
+      const team = await this.dataService.team.getById(inputTask.team.id);
+      // Checks the team actually exists or not.
+      this.helper.validateCreateInput(team);
+      // Checks if user is a memeber or not
+      this.helper.checkTeamTaskAuthorization(team, requestUser);
+    }
 
     inputTask.created_by = requestUser;
-    if (!inputTask.team) inputTask.assigned_to = [requestUser];
-
     return this.dataService.task.create(inputTask);
   }
 
@@ -39,13 +43,20 @@ export class TaskUseCases {
   // Done
   async updateTask(inputTask: Task, requestUser: User): Promise<Task> {
     const task = await this.dataService.task.getById(inputTask.id);
-    this.helper.validateOperation(task);
 
-    const team = task?.team
-      ? await this.dataService.team.getById(task.team.id)
-      : null;
+    // Validate if task exists or not.
+    this.helper.validateInput(task);
 
-    this.helper.checkMutateAuthorization(team, requestUser, task);
+    // If a team task, checks for required authorization.
+    if (task.team) {
+      const team = await this.dataService.team.getById(task.team.id);
+      this.helper.checkTeamTaskAuthorization(team, requestUser);
+    }
+    // If individual task, checks if user is the cretor of task.
+    else {
+      this.helper.isOwner(task, requestUser);
+    }
+
     const updatedTask = { ...task, ...inputTask };
 
     return this.dataService.task.update(task.id, updatedTask);
@@ -58,16 +69,19 @@ export class TaskUseCases {
     requestUser: User,
   ): Promise<Task> {
     const task = await this.dataService.task.getById(id);
-    const team = task?.team
-      ? await this.dataService.team.getById(task?.team.id)
-      : null;
+    // Validates if task exists or not.
+    this.helper.validateInput(task);
 
-    this.helper.checkMutateAuthorization(team, requestUser, task);
+    // Can only perform assignment operation on team task.
     this.helper.validateAssignmentOperation(task);
-    this.commonHelper.areTeamMembers(team, assign);
 
-    // const teamMembersOnly = this.helper.filterUsersList(assign, team.members);
-    const newAssignedList = this.commonHelper.mergeUsersList(
+    const team = await this.dataService.team.getById(task.team.id);
+    // Checks if the user is either an admin or task creator.
+    this.helper.checkTeamTaskSpecialAuthorization(task, team, requestUser);
+    // Checks if the provided users are team members or not.
+    this.helper.checkIfTeamMembers(team, assign);
+
+    const newAssignedList = this.helper.mergeUsersList(
       task.assigned_to,
       assign,
     );
@@ -83,34 +97,42 @@ export class TaskUseCases {
     requestUser: User,
   ): Promise<Task> {
     const task = await this.dataService.task.getById(id);
-    const team = task?.team
-      ? await this.dataService.team.getById(task?.team.id)
-      : null;
+    // Validates if task exists or not.
+    this.helper.validateInput(task);
 
-    this.helper.checkMutateAuthorization(team, requestUser, task);
+    // Can only perform assignment operation on team task.
     this.helper.validateAssignmentOperation(task);
-    this.commonHelper.areTeamMembers(team, unassign);
 
-    const newAssignedList = this.commonHelper.filterUsersList(
+    const team = await this.dataService.team.getById(task.team.id);
+    this.helper.checkTeamTaskSpecialAuthorization(task, team, requestUser);
+    // Checks if the provided users are team members or not.
+    this.helper.checkIfTeamMembers(team, unassign);
+
+    const newAssignedList = this.helper.filterUsersList(
       task.assigned_to,
       unassign,
     );
 
     task.assigned_to = newAssignedList;
-    console.log({unassign,newAssignedList,assigned_to:task.assigned_to});
     return this.dataService.task.update(id, task);
   }
 
   //Done
   async deleteTask(id: string, requestUser: User): Promise<void> {
     const task = await this.dataService.task.getById(id);
-    this.helper.validateOperation(task);
+    // Validates if task exists or not.
+    this.helper.validateInput(task);
 
-    const team = task?.team
-      ? await this.dataService.team.getById(task.team.id)
-      : null;
-
-    this.helper.checkMutateAuthorization(team, requestUser, task);
+    // If team task,
+    if (task.team) {
+      const team = await this.dataService.team.getById(task.team.id);
+      //Checks if the user is either an admin or task creator
+      this.helper.checkTeamTaskSpecialAuthorization(task, team, requestUser);
+    }
+    // If individual task, checks if user is the creator of task.
+    else {
+      this.helper.isOwner(task, requestUser);
+    }
 
     await this.dataService.task.delete(id);
   }

@@ -4,10 +4,6 @@ import { Task, User } from "src/domain/entities";
 import { GenericEntityDto } from "src/presentation/common/dtos";
 
 export class CreateCommentDto {
-  @IsUUID()
-  @IsNotEmpty()
-  id: string;
-
   @IsString()
   @IsNotEmpty()
   content: string;
@@ -16,10 +12,6 @@ export class CreateCommentDto {
     @Type(()=>GenericEntityDto)
    @IsNotEmptyObject()
    task:Task;
-
-   @IsDate()
-    @IsOptional()
-   created_at?:Date;
 }
 
 

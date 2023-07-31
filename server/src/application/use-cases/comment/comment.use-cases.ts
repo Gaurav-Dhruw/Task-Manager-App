@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { IDataService } from 'src/domain/abstracts';
 import { Comment, User } from 'src/domain/entities';
-import { CommentUseCasesHelper } from './comment-use-cases.helper';
+import { CommentUseCasesHelper } from './helpers/comment-use-cases.helper';
 
 @Injectable()
 export class CommentUseCases {
@@ -14,52 +14,41 @@ export class CommentUseCases {
     private readonly helper: CommentUseCasesHelper,
   ) {}
 
-  async createComment(commentInput: Comment): Promise<Comment> {
-    const requestedUser = commentInput.user;
-    const attachedTask = commentInput.task;
+  //Done
+  async createComment(inputComment: Comment): Promise<Comment> {
+    const requestUser = inputComment.user;
+    const inputTask = inputComment.task;
 
-    const resp = await Promise.all([
-      await this.dataService.user.getById(requestedUser?.id),
-      await this.dataService.task.getById(attachedTask?.id),
-    ]);
+    const task = await this.dataService.task.getById(inputTask.id);
 
-    const user = resp[0];
-    const task = resp[1];
+    this.helper.validateCreateInput(task);
+    this.helper.checkCreateAuthorization(task, requestUser);
+    this.helper.validateCreateOperation(task);
 
-    this.helper.validateOperation({task,user});
-
-    return this.dataService.comment.create(commentInput);
+    inputComment.created_at = new Date();
+    return this.dataService.comment.create(inputComment);
   }
 
+  //Done
   async updateComment(
-    commentInput: Comment,
-    requestedUser: User,
+    inputComment: Comment,
+    requestUser: User,
   ): Promise<Comment> {
-    const resp = await Promise.all([
-      await this.dataService.user.getById(requestedUser?.id),
-      await this.dataService.comment.getById(commentInput.id),
-    ]);
+    const comment = await this.dataService.comment.getById(inputComment.id);
 
-    const user = resp[0];
-    const comment = resp[1];
+    this.helper.validateMutateInput(comment);
+    this.helper.checkMutateAuthorization(comment, requestUser);
 
-    this.helper.validateOperation(comment);
-    this.helper.checkAuthorization(comment, user);
-
-    return this.dataService.comment.update(commentInput.id, commentInput);
+    const updatedComment = {...comment, ...inputComment};
+    return this.dataService.comment.update(inputComment.id, updatedComment);
   }
 
+  // Done
   async deleteComment(id: string, requestUser: User): Promise<void> {
-    const resp = await Promise.all([
-      await this.dataService.user.getById(requestUser?.id),
-      await this.dataService.comment.getById(id),
-    ]);
+    const comment = await this.dataService.comment.getById(id);
 
-    const user = resp[0];
-    const comment = resp[1];
-
-    this.helper.validateOperation(comment);
-    this.helper.checkAuthorization(comment, user);
+    this.helper.validateMutateInput(comment);
+    this.helper.checkMutateAuthorization(comment, requestUser);
 
     await this.dataService.comment.delete(id);
   }

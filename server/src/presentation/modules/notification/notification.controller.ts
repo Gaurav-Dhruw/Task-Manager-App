@@ -18,16 +18,15 @@ export class NotificationController {
     @Req() req: CustomRequest,
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<Notification> {
-    const requestedUser = new User(req.user);
-    return this.notificationUseCases.markAsRead(id, requestedUser);
+    const requestUser = new User(req.user);
+    return this.notificationUseCases.markAsRead(id, requestUser);
   }
 
   @Patch('read-all')
   markAllAsRead(
     @Req() req: CustomRequest,
   ): Promise<Notification[]> {
-    const requestedUser = new User(req.user);
-    return this.notificationUseCases.markAllAsRead(requestedUser.id);
+    return this.notificationUseCases.markAllAsRead(req.user.id);
   }
 
   @Delete(':id')
@@ -35,8 +34,8 @@ export class NotificationController {
     @Req() req: CustomRequest,
     @Param('id', ParseUUIDPipe) id: string,
   ) {
-    const requestedUser = new User(req.user);
-    await this.notificationUseCases.deleteNotification(id, requestedUser);
+    const requestUser = new User(req.user);
+    await this.notificationUseCases.deleteNotification(id, requestUser);
     return { message: `Notification with id: ${id} deleted` };
   }
 }

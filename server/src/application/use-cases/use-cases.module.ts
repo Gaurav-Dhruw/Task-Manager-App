@@ -5,7 +5,6 @@ import { TaskUseCasesModule } from './task/task-use-cases.module';
 import { CommentUseCasesModule } from './comment/comment-use-cases.module';
 import { ReminderUseCasesModule } from './reminder/reminder-use-cases.module';
 import { NotificationUseCasesModule } from './notification/notification-use-cases.module';
-import { CommonUseCasesHelper } from '../helpers/use-cases.helper';
 
 @Global()
 @Module({
@@ -17,7 +16,6 @@ import { CommonUseCasesHelper } from '../helpers/use-cases.helper';
     ReminderUseCasesModule,
     NotificationUseCasesModule,
   ],
-  providers: [CommonUseCasesHelper],
   exports: [
     UserUseCasesModule,
     TeamUseCasesModule,
@@ -25,7 +23,6 @@ import { CommonUseCasesHelper } from '../helpers/use-cases.helper';
     CommentUseCasesModule,
     ReminderUseCasesModule,
     NotificationUseCasesModule,
-    CommonUseCasesHelper,
   ],
 })
 export class UseCasesModule {}

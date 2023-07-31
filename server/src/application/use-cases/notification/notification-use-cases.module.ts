@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
 import { NotificationUseCases } from './notification.use-cases';
-import { NotificationUseCasesHelper } from './notification-use-cases.helper';
+import { NotificationUseCasesHelperModule } from './helpers/notification-use-cases-helper.module';
 
 @Module({
-  providers: [NotificationUseCases, NotificationUseCasesHelper],
+  imports:[NotificationUseCasesHelperModule],
+  providers: [NotificationUseCases],
   exports: [NotificationUseCases],
 })
 export class NotificationUseCasesModule {}
