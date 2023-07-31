@@ -21,8 +21,8 @@ export class UserRepository implements IUserRepository {
   }
 
   getByIds(ids: string[]): Promise<User[]> {
-    return this.userRepository.findBy({
-      id: In(ids),
+    return this.userRepository.find({
+      where: { id: In(ids) },
     });
   }
   getAll(): Promise<User[]> {

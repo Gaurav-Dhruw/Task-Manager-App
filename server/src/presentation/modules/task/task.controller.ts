@@ -1,4 +1,15 @@
-import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post, Req } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+  Req,
+  UsePipes,
+} from '@nestjs/common';
 import { TaskUseCases } from 'src/application/use-cases/task/task.use-cases';
 import { CustomRequest } from 'src/presentation/common/types';
 import {
@@ -6,8 +17,10 @@ import {
   CreateTaskDto,
   UnassignFromTaskDto,
   UpdateTaskDto,
+  UpdateTaskResponseDto,
 } from './dtos';
 import { Task, User } from 'src/domain/entities';
+import { UpdateDtoValidationPipe } from 'src/presentation/common/pipes';
 
 @Controller('task')
 export class TaskController {
@@ -23,22 +36,28 @@ export class TaskController {
     return this.taskUseCases.createTask(task, requestUser);
   }
 
-  @Get()
+  @Get('assigned')
   getTasks(@Req() req: CustomRequest): Promise<Task[]> {
     return this.taskUseCases.getTasks(req.user.id);
   }
 
+  
+
+  @UsePipes(new UpdateDtoValidationPipe(['status', 'title']))
   @Patch('update')
-  updateTask(
+  async updateTask(
     @Req() req: CustomRequest,
     @Body() taskDto: UpdateTaskDto,
-  ): Promise<Task> {
+  ): Promise<UpdateTaskResponseDto> {
     const requestUser = new User(req.user);
     const task = new Task(taskDto);
-    return this.taskUseCases.updateTask(task, requestUser);
+    const updatedTask = await this.taskUseCases.updateTask(task, requestUser);
+    const res = new UpdateTaskResponseDto(updatedTask);
+    console.log(res);
+    return res;
   }
 
-  @Patch('update/assign')
+  @Patch('/assign')
   assignTask(
     @Req() req: CustomRequest,
     @Body() taskDto: AssignToTaskDto,
@@ -51,7 +70,7 @@ export class TaskController {
     );
   }
 
-  @Patch('update/unassign')
+  @Patch('/unassign')
   unassignTask(
     @Req() req: CustomRequest,
     @Body() taskDto: UnassignFromTaskDto,
@@ -70,9 +89,6 @@ export class TaskController {
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<void> {
     const requestUser = new User(req.user);
-    await this.taskUseCases.deleteTask(
-      id,
-      requestUser,
-    );
+    await this.taskUseCases.deleteTask(id, requestUser);
   }
 }

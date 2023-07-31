@@ -1,11 +1,9 @@
 import {
-  BadRequestException,
   Injectable,
-  NotFoundException,
 } from '@nestjs/common';
 import { IDataService } from 'src/domain/abstracts';
 import { Reminder, User } from 'src/domain/entities';
-import { ReminderUseCasesHelper } from './reminder-use-cases.helper';
+import { ReminderUseCasesHelper } from './helpers/reminder-use-cases.helper';
 
 @Injectable()
 export class ReminderUseCases {
@@ -14,46 +12,40 @@ export class ReminderUseCases {
     private readonly helper: ReminderUseCasesHelper,
   ) {}
 
-  async createReminder(reminderInput: Reminder): Promise<Reminder> {
-    let task = reminderInput.task;
-    let receivers = reminderInput.receivers;
-    const ids = receivers.map((receiver) => receiver.id);
+  async createReminder(
+    reminderInput: Reminder,
+    requestUser: User,
+  ): Promise<Reminder> {
+    const inputTask = reminderInput.task;
+    const task = await this.dataService.task.getById(inputTask?.id);
 
-    const resp = await Promise.all([
-      await this.dataService.task.getById(task?.id),
-      await this.dataService.user.getByIds(ids),
-    ]);
+    this.helper.validateCreateOperation(task, reminderInput.scheduled_for);
+    this.helper.checkAuthorization(task, requestUser);
 
-    task = resp[0];
-
-    if (!task) throw new NotFoundException('Task Not Found');
-
-    receivers = resp[1];
-    reminderInput.receivers = receivers;
-
+    reminderInput.receivers = task.assigned_to;
     return this.dataService.reminder.create(reminderInput);
   }
 
   async updateReminder(
     id: string,
     reschedule: Date,
-    requestedUser: User,
+    requestUser: User,
   ): Promise<Reminder> {
-    if (reschedule <= new Date())
-      throw new BadRequestException('Invalid Reschedule Value');
-
     const reminder = await this.dataService.reminder.getById(id);
+    this.helper.validateUpdateOperation(reminder, reschedule);
 
-    this.helper.validateOperation(reminder, requestedUser);
+    const task = await this.dataService.task.getById(reminder.task.id);
+    this.helper.checkAuthorization(task, requestUser);
 
     reminder.scheduled_for = reschedule;
     return this.dataService.reminder.update(id, reminder);
   }
 
-  async deleteReminder(id: string, requestedUser: User): Promise<void> {
+  async deleteReminder(id: string, requestUser: User): Promise<void> {
     const reminder = await this.dataService.reminder.getById(id);
-
-    this.helper.validateOperation(reminder, requestedUser);
+    this.helper.validateDeleteOperation(reminder);
+    const task = await this.dataService.task.getById(reminder?.task.id);
+    this.helper.checkAuthorization(task, requestUser);
 
     await this.dataService.reminder.delete(id);
   }

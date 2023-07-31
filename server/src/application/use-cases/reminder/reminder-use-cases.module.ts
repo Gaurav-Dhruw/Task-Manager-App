@@ -1,10 +1,10 @@
-import { Module } from "@nestjs/common";
-import { ReminderUseCases } from "./reminder.use-cases";
-import { ReminderUseCasesHelper } from "./reminder-use-cases.helper";
+import { Module } from '@nestjs/common';
+import { ReminderUseCases } from './reminder.use-cases';
+import { ReminderUseCasesHelperModule } from './helpers/reminder-use-cases-helper.module';
 
 @Module({
-    imports:[],
-    providers:[ReminderUseCases, ReminderUseCasesHelper],
-    exports:[ReminderUseCases],
+  imports: [ReminderUseCasesHelperModule],
+  providers: [ReminderUseCases],
+  exports: [ReminderUseCases],
 })
-export class ReminderUseCasesModule{}
+export class ReminderUseCasesModule {}

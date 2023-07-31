@@ -50,9 +50,8 @@ export class Task {
   @OneToMany(() => Comment, (comment) => comment.task, { nullable: true })
   comments?: Comment[];
 
-  @OneToOne(() => Reminder, (reminder) => reminder.task, {
+  @OneToMany(() => Reminder, (reminder) => reminder.task, {
     nullable: true,
   })
-  @JoinColumn()
-  reminder?: Reminder;
+  reminders?: Reminder[];
 }

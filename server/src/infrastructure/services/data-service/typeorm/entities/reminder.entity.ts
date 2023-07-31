@@ -2,6 +2,9 @@ import {
   Column,
   Entity,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -13,14 +16,11 @@ export class Reminder {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @OneToOne(()=>User)
-  @JoinColumn()
-  created_by: User;
-
-  @OneToMany(() => User, (user) => user.reminders)
+  @ManyToMany(() => User)
+  @JoinTable()
   receivers: User[];
 
-  @OneToOne(() => Task, (task) => task.reminder)
+  @ManyToOne(() => Task, (task) => task.reminders)
   task: Task;
 
   @Column()

@@ -20,7 +20,7 @@ import {
   UpdateTeamDto,
 } from './dtos';
 import { CustomRequest } from 'src/presentation/common/types';
-import { UpdateTeamDtoValidationPipe } from './pipes';
+import { UpdateDtoValidationPipe } from 'src/presentation/common/pipes';
 
 @Controller('team')
 export class TeamController {
@@ -49,7 +49,7 @@ export class TeamController {
     return this.teamUseCases.createTeam(team, requestUser);
   }
 
-  @UsePipes(UpdateTeamDtoValidationPipe)
+  @UsePipes(new UpdateDtoValidationPipe(['team_name']))
   @Patch('update')
   async updateTeam(@Req() req: CustomRequest, @Body() teamDto: UpdateTeamDto) {
     const team = new Team(teamDto);

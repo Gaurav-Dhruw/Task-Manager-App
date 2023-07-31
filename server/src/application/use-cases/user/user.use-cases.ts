@@ -36,7 +36,9 @@ export class UserUseCases {
   async updateUser(inputUser: User, requestUser:User): Promise<User> {
     const user = await this.dataService.user.getById(inputUser?.id);
     this.helper.validateMutateOperation(user, requestUser);
-    return this.dataService.user.update(inputUser.id, inputUser);
+
+    const updatedUser = {...user,...inputUser};
+    return this.dataService.user.update(inputUser.id, updatedUser);
   }
 
   getUsersByIds(users: User[]): Promise<User[]> {

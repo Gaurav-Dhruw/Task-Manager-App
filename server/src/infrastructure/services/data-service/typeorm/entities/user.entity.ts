@@ -1,4 +1,4 @@
-import { Reminder, Team } from './';
+import { Reminder, Task, Team } from './';
 import {
   Column,
   Entity,
@@ -33,8 +33,4 @@ export class User {
   })
   teams?: Team[];
 
-  @ManyToOne(() => Reminder, (reminder) => reminder.receivers, {
-    nullable: true,
-  })
-  reminders?: Reminder[];
 }

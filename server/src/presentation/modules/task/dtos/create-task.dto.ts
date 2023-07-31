@@ -3,6 +3,7 @@ import {
   ArrayMinSize,
   IsArray,
   IsDate,
+  IsDateString,
   IsEnum,
   IsNotEmpty,
   IsObject,
@@ -26,7 +27,7 @@ export class CreateTaskDto
   @IsOptional()
   description?: string;
 
-  @IsDate()
+  @IsDateString()
   @IsOptional()
   deadline?: Date;
 

@@ -20,7 +20,7 @@ import {
 import { UserUseCases } from 'src/application/use-cases/user/user.use-cases';
 import { ITokenService } from 'src/domain/abstracts';
 import { CustomRequest } from 'src/presentation/common/types';
-import { UpdateUserDtoValidationPipe } from './pipes';
+import { UpdateDtoValidationPipe } from 'src/presentation/common/pipes';
 
 @Controller('user')
 export class UserController {
@@ -51,7 +51,7 @@ export class UserController {
     return new RegisterUserResponseDto({ ...registeredUser, token });
   }
 
-  @UsePipes(new UpdateUserDtoValidationPipe())
+  @UsePipes(new UpdateDtoValidationPipe(['name']))
   @Patch('update')
   async updateUser(@Req() req: CustomRequest, @Body() userDto: UpdateUserDto) {
     const inputUser = new User(userDto);

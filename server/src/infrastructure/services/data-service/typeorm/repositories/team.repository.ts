@@ -13,7 +13,7 @@ export class TeamRepository implements ITeamRepository {
   getById(id: string): Promise<Team> {
     return this.teamRepository.findOne({
       where: { id },
-      relations: ['admins', 'members'],
+      relations: ['admins', 'members', 'tasks'],
     });
   }
   getAll(): Promise<Team[]> {

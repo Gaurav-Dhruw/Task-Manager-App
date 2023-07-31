@@ -1,23 +1,11 @@
-import { Type } from 'class-transformer';
-import {
-  IsString,
-  IsNotEmpty,
-  IsOptional,
-  IsEnum,
-  ValidateNested,
-  IsObject,
-  ArrayMinSize,
-  IsArray,
-  IsUUID,
-} from 'class-validator';
-import { Task, User, Team } from 'src/domain/entities';
+import { IsNotEmpty, IsOptional, IsEnum, IsUUID } from 'class-validator';
+import { Task } from 'src/domain/entities';
 import { Priority, Status } from 'src/domain/types';
-import { GenericEntityDto } from 'src/presentation/common/dtos';
 import { CreateTaskDto } from './create-task.dto';
 import { OmitType, PartialType } from '@nestjs/mapped-types';
 
 export class UpdateTaskDto extends PartialType(
-  OmitType(CreateTaskDto, [ 'team']),
+  OmitType(CreateTaskDto, ['team']),
 ) {
   @IsUUID()
   @IsNotEmpty()
@@ -26,4 +14,22 @@ export class UpdateTaskDto extends PartialType(
   @IsEnum(Status)
   @IsOptional()
   status?: Status;
+}
+
+export class UpdateTaskResponseDto {
+  id: string;
+  title: string;
+  description: string;
+  deadline: Date;
+  status: Status;
+  priority: Priority;
+
+  constructor(options?: Partial<Task>) {
+    this.id = options?.id ?? this.id;
+    this.title = options?.title ?? this.title;
+    this.description = options?.description ? options.description : null;
+    this.deadline = options?.deadline ? options.deadline : null;
+    this.status = options?.status ?? this.status;
+    this.priority = options?.priority ? options.priority : null;
+  }
 }

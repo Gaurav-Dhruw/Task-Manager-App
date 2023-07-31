@@ -8,11 +8,13 @@ import {
 import { IDataService } from 'src/domain/abstracts';
 import { Team, User } from 'src/domain/entities';
 import { TeamUseCasesHelper } from './team-use-cases.helper';
+import { CommonUseCasesHelper } from 'src/application/helpers/use-cases.helper';
 
 @Injectable()
 export class TeamUseCases {
   constructor(
     private readonly dataService: IDataService,
+    private readonly commonHelper: CommonUseCasesHelper,
     private readonly helper: TeamUseCasesHelper,
   ) {}
 
@@ -44,12 +46,12 @@ export class TeamUseCases {
     return this.dataService.team.create(teamInput);
   }
 
-  async updateTeam(teamInput:Team, requestUser:User):Promise<Team>{
+  async updateTeam(teamInput: Team, requestUser: User): Promise<Team> {
     const team = await this.dataService.team.getById(teamInput.id);
 
-    this.helper.validateOperation({team, requestUser});
+    this.helper.validateOperation({ team, requestUser });
     this.helper.checkAuthorization(team, requestUser);
-    
+
     return this.dataService.team.update(teamInput.id, teamInput);
   }
 
@@ -66,9 +68,9 @@ export class TeamUseCases {
 
     this.helper.validateOperation({ team, requestUser, usersList, inputUsers });
     this.helper.checkAuthorization(team, requestUser);
-    this.helper.checkAdminAccess(team, requestUser);
+    this.commonHelper.checkAdminAccess(team, requestUser);
 
-    team.members = this.helper.mergeUsersList(team.members, inputUsers);
+    team.members = this.commonHelper.mergeUsersList(team.members, inputUsers);
 
     return this.dataService.team.update(team.id, team);
   }
@@ -82,12 +84,18 @@ export class TeamUseCases {
 
     this.helper.validateOperation({ team, requestUser });
     this.helper.checkAuthorization(team, requestUser);
-    this.helper.checkAdminAccess(team, requestUser);
-    this.helper.areTeamMembers(team, removalList);
+    this.commonHelper.checkAdminAccess(team, requestUser);
+    this.commonHelper.areTeamMembers(team, removalList);
     this.helper.areTeamAdmins(team, removalList);
 
-    const newAdminsList = this.helper.filterUsers(team.admins, removalList);
-    const newMembersList = this.helper.filterUsers(team.members, removalList);
+    const newAdminsList = this.commonHelper.filterUsersList(
+      team.admins,
+      removalList,
+    );
+    const newMembersList = this.commonHelper.filterUsersList(
+      team.members,
+      removalList,
+    );
 
     team.admins = newAdminsList;
     team.members = newMembersList;
@@ -104,10 +112,10 @@ export class TeamUseCases {
 
     this.helper.validateOperation({ team, requestUser });
     this.helper.checkAuthorization(team, requestUser);
-    this.helper.checkAdminAccess(team, requestUser);
-    this.helper.areTeamMembers(team, inputUsers);
+    this.commonHelper.checkAdminAccess(team, requestUser);
+    this.commonHelper.areTeamMembers(team, inputUsers);
 
-    team.admins = this.helper.mergeUsersList(team.admins, inputUsers);
+    team.admins = this.commonHelper.mergeUsersList(team.admins, inputUsers);
 
     return this.dataService.team.update(team.id, team);
   }

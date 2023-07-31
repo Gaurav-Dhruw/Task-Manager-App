@@ -19,7 +19,7 @@ export class TaskRepository implements ITaskRepository {
   getAll(): Promise<Task[]> {
     return this.taskRepository.find();
   }
-  
+
   getAllWhereUser(user_id: string): Promise<Task[]> {
     return this.taskRepository.find({
       where: { assigned_to: { id: user_id } },

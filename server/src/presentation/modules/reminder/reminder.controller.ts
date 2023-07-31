@@ -1,43 +1,44 @@
-import { Body, Controller, Param, ParseUUIDPipe, Req } from '@nestjs/common';
+import { Body, Controller, Delete, Param, ParseUUIDPipe, Patch, Post, Req } from '@nestjs/common';
 import { ReminderUseCases } from 'src/application/use-cases/reminder/reminder.use-cases';
 import { CustomRequest } from 'src/presentation/common/types';
 import { UpdateReminderDto, createReminderDto } from './dtos';
 import { Reminder, User } from 'src/domain/entities';
 
-@Controller()
+@Controller('reminder')
 export class ReminderController {
   constructor(private readonly reminderUserCases: ReminderUseCases) {}
 
+  @Post('create')
   createReminder(
     @Req() req: CustomRequest,
     @Body() reminderDto: createReminderDto,
   ) {
     const reminder = new Reminder(reminderDto);
-    reminder.created_by = new User(req.user);
-
-    return this.reminderUserCases.createReminder(reminder);
+    const requestUser = new User(req.user);
+    return this.reminderUserCases.createReminder(reminder,requestUser);
   }
-
+  @Patch('update')
   updateReminder(
     @Req() req: CustomRequest,
     @Body() reminderDto: UpdateReminderDto,
   ) {
     const id = reminderDto.id,
       rescheduleFor = reminderDto.reschedule_for;
-    const requestedUser = new User(req.user);
+    const requestUser = new User(req.user);
     return this.reminderUserCases.updateReminder(
       id,
       rescheduleFor,
-      requestedUser,
+      requestUser,
     );
   }
 
+  @Delete(':id')
   async deleteReminder(
     @Req() req: CustomRequest,
     @Param('id', ParseUUIDPipe) id: string,
   ) {
     const requestedUser = new User(req.user);
     await this.reminderUserCases.deleteReminder(id, requestedUser);
-    return {message: `Reminder ${id} deleted`};
+    return;
   }
 }

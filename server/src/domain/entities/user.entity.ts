@@ -1,4 +1,4 @@
-import { Team } from './';
+import { Task, Team } from './';
 
 
 export class User {
