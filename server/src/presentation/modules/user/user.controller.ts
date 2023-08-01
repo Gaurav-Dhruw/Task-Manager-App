@@ -36,7 +36,7 @@ export class UserController {
     const userInput = new User(userDto);
     const user = await this.userUserCases.loginUser(userInput);
     const token = this.tokenService.generateToken(user);
-  
+
     return new LoginUserResponseDto({ ...user, token });
   }
 
@@ -56,7 +56,8 @@ export class UserController {
   async updateUser(@Req() req: CustomRequest, @Body() userDto: UpdateUserDto) {
     const inputUser = new User(userDto);
     const requestUser = new User(req.user);
-    return this.userUserCases.updateUser(inputUser, requestUser);
+    const user = await this.userUserCases.updateUser(inputUser, requestUser);
+    return console.log(user);
   }
 
   @Patch('update/credentials')
@@ -70,5 +71,4 @@ export class UserController {
   // findUsersByIds(@Body('users') users: User[]) {
   //   return this.userUserCases.getUsersByIds(users);
   // }
-
 }

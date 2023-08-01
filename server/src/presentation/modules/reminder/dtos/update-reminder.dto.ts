@@ -1,4 +1,4 @@
-import { IsDate, IsDateString, IsNotEmpty, IsUUID } from 'class-validator';
+import {  IsDateString, IsNotEmpty, IsUUID } from 'class-validator';
 
 export class UpdateReminderDto {
   @IsUUID()
@@ -7,5 +7,5 @@ export class UpdateReminderDto {
 
   @IsDateString()
   @IsNotEmpty()
-  reschedule_for: Date;
+  scheduled_for: Date;
 }

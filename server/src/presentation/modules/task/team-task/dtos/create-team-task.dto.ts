@@ -15,7 +15,7 @@ import { Task, Team, User } from 'src/domain/entities';
 import { Priority } from 'src/domain/types';
 import { GenericEntityDto } from 'src/presentation/common/dtos';
 
-export class CreateTaskDto
+export class CreateTeamTaskDto
   implements Omit<Task, 'id' | 'status' | 'assigned_to' | 'created_by'>
 {
   @IsString()
@@ -38,6 +38,5 @@ export class CreateTaskDto
   @ValidateNested()
   @Type(() => GenericEntityDto)
   @IsObject()
-  @IsOptional()
-  team?: Team;
+  team: Team;
 }

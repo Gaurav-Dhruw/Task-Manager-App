@@ -1,14 +1,12 @@
 import { Type } from 'class-transformer';
 import {
-  IsArray,
-  IsDate,
+
   IsNotEmpty,
   IsNotEmptyObject,
   ValidateNested,
-  ArrayMinSize,
   IsDateString,
 } from 'class-validator';
-import { Task, User } from 'src/domain/entities';
+import { Task } from 'src/domain/entities';
 import { GenericEntityDto } from 'src/presentation/common/dtos';
 
 export class createReminderDto {

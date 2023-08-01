@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
+import { PersonalTaskUseCasesModule } from './personal-task/personal-task-use-cases.module';
+import { TeamTaskUseCasesModule } from './team-task/team-task-use-cases.module';
 import { TaskUseCases } from './task.use-cases';
-import { TaskUseCasesHelper } from './helpers/task-use-cases.helper';
-import { TaskUseCasesHelperModule } from './helpers/task-use-cases-helper.module';
 
 @Module({
-  imports: [TaskUseCasesHelperModule],
+  imports: [PersonalTaskUseCasesModule, TeamTaskUseCasesModule],
   providers: [TaskUseCases],
-  exports: [TaskUseCases],
+  exports: [PersonalTaskUseCasesModule, TeamTaskUseCasesModule],
 })
 export class TaskUseCasesModule {}

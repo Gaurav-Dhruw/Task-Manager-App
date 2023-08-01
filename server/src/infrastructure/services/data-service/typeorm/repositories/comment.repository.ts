@@ -20,6 +20,13 @@ export class CommentRepository implements ICommentRepository {
   getAll(): Promise<Comment[]> {
     return this.commentRepository.find({ relations: ['user', 'task'] });
   }
+
+  getAllWhereTask(task_id: string): Promise<Comment[]> {
+    return this.commentRepository.find({
+      where: { task: { id: task_id } },
+      order: { created_at: 'DESC' },
+    });
+  }
   create(comment: Comment): Promise<Comment> {
     return this.commentRepository.save(comment);
   }

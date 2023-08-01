@@ -5,35 +5,55 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Comment, Task, User } from 'src/domain/entities';
+import { Comment, Task, Team, User } from 'src/domain/entities';
 import { AuthorizationHelper } from './authorization.helper';
-import { ValidateOperationHelper } from './validate-input.helper';
+import { ValidateInputHelper } from './validate-input.helper';
+import { ValidateOperationHelper } from './validate-operation-helper';
 
 @Injectable()
 export class CommentUseCasesHelper {
   constructor(
     private readonly authorizationHelper: AuthorizationHelper,
+    private readonly validateInputHelper: ValidateInputHelper,
     private readonly validateOperationHelper: ValidateOperationHelper,
   ) {}
 
-  validateCreateInput(task: Task): void {
-    this.validateOperationHelper.validateTask(task);
+  validateCreateInput(team: Team, task: Task): void {
+    this.validateInputHelper.validateTask(task);
+    this.validateInputHelper.validateTeam(team);
   }
-  validateCreateOperation(task: Task) {
-    if (!task.team)
-      throw new BadRequestException('Comments Not Allowed On Personal Task');
+  validateCreateOperation(team: Team, task: Task) {
+    const isTeamTask = this.validateOperationHelper.isTeamTask(task);
+    const taskBelongsToTheTeam =
+      this.validateOperationHelper.taskBelongsToTheTeam(task, team);
+
+    if (!isTeamTask || !taskBelongsToTheTeam) throw new BadRequestException();
+  }
+
+  validateReadInput(team: Team, task: Task) {
+    this.validateInputHelper.validateTask(task);
+    this.validateInputHelper.validateTeam(team);
+  }
+
+  validateReadOperation(team: Team, task: Task) {
+    const isTeamTask = this.validateOperationHelper.isTeamTask(task);
+    const taskBelongsToTheTeam =
+      this.validateOperationHelper.taskBelongsToTheTeam(task, team);
+
+    if (!isTeamTask || !taskBelongsToTheTeam) throw new BadRequestException();
+  }
+  checkReadAuthorization(team: Team, user: User) {
+    const isMember = this.authorizationHelper.isMember(team, user);
+    if (!isMember) throw new UnauthorizedException('User Unauthorized');
   }
 
   validateMutateInput(comment: Comment): void {
-    this.validateOperationHelper.validateComment(comment);
+    this.validateInputHelper.validateComment(comment);
   }
 
-  checkCreateAuthorization(task: Task, user: User) {
-    const isCreator = this.authorizationHelper.isTaskCreator(task, user);
-    const isAssigned = this.authorizationHelper.isAssignedTo(task, user);
-
-    if (!isCreator && !isAssigned)
-      throw new UnauthorizedException('User Unauthorized');
+  checkCreateAuthorization(team: Team, user: User) {
+    const isMember = this.authorizationHelper.isMember(team, user);
+    if (!isMember) throw new UnauthorizedException('User Unauthorized');
   }
 
   checkMutateAuthorization(comment: Comment, user: User) {

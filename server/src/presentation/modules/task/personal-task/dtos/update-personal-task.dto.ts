@@ -1,12 +1,10 @@
 import { IsNotEmpty, IsOptional, IsEnum, IsUUID } from 'class-validator';
 import { Task } from 'src/domain/entities';
 import { Priority, Status } from 'src/domain/types';
-import { CreateTaskDto } from './create-task.dto';
-import { OmitType, PartialType } from '@nestjs/mapped-types';
+import { CreatePersonalTaskDto } from './create-personal-task.dto';
+import {  PartialType } from '@nestjs/mapped-types';
 
-export class UpdateTaskDto extends PartialType(
-  OmitType(CreateTaskDto, ['team']),
-) {
+export class UpdatePersonalTaskDto extends PartialType(CreatePersonalTaskDto) {
   @IsUUID()
   @IsNotEmpty()
   id: string;
@@ -16,7 +14,7 @@ export class UpdateTaskDto extends PartialType(
   status?: Status;
 }
 
-export class UpdateTaskResponseDto {
+export class UpdatePersonalTaskResponseDto {
   id: string;
   title: string;
   description: string;

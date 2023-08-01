@@ -13,22 +13,38 @@ import { CreateCommentDto, UpdateCommentDto } from './dtos';
 import { CustomRequest } from 'src/presentation/common/types';
 import { Comment, Task, User } from 'src/domain/entities';
 
-@Controller('comment')
+@Controller('team/:team_id/task/:task_id/comment')
 export class CommentController {
   constructor(private readonly commentUseCases: CommentUseCases) {}
 
-  @Post('create')
+  @Post()
   createComment(
     @Req() req: CustomRequest,
+    @Param('team_id', ParseUUIDPipe) team_id: string,
+    @Param('task_id', ParseUUIDPipe) task_id: string,
     @Body() commentDto: CreateCommentDto,
   ) {
     const comment = new Comment(commentDto);
+    comment.task = new Task({ id: task_id });
     comment.user = new User(req.user);
-
-    return this.commentUseCases.createComment(comment);
+    return this.commentUseCases.createComment(comment, team_id);
   }
 
-  @Patch('create')
+  getComments(
+    @Req() req: CustomRequest,
+    @Param('team_id', ParseUUIDPipe) team_id: string,
+    @Param('task_id', ParseUUIDPipe) task_id: string,
+  ) {
+
+    const requestUser = new User(req.user);
+    return this.commentUseCases.getComments(
+      team_id,
+      task_id,
+      requestUser,
+    );
+  }
+
+  @Patch()
   updateComment(
     @Req() req: CustomRequest,
     @Body() commentDto: UpdateCommentDto,
@@ -36,11 +52,14 @@ export class CommentController {
     const comment = new Comment(commentDto);
     const requestUser = new User(req.user);
 
-    return this.commentUseCases.updateComment( comment, requestUser);
+    return this.commentUseCases.updateComment(comment, requestUser);
   }
 
   @Delete(':id')
-  async deleteComment(@Req() req: CustomRequest, @Param('id', ParseUUIDPipe) id: string) {
+  async deleteComment(
+    @Req() req: CustomRequest,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) {
     const requestUser = new User(req.user);
 
     await this.commentUseCases.deleteComment(id, requestUser);
