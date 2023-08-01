@@ -35,10 +35,9 @@ export class Task {
   priority?: Priority;
 
   @ManyToOne(() => User)
-  @JoinColumn()
   created_by: User;
 
-  @ManyToMany(() => User)
+  @ManyToMany(() => User, (user) => user.tasks)
   @JoinTable()
   assigned_to: User[];
 
@@ -47,11 +46,15 @@ export class Task {
   })
   team?: Team;
 
-  @OneToMany(() => Comment, (comment) => comment.task, { nullable: true })
+  @OneToMany(() => Comment, (comment) => comment.task, {
+    nullable: true,
+    onDelete: 'CASCADE',
+  })
   comments?: Comment[];
 
   @OneToMany(() => Reminder, (reminder) => reminder.task, {
     nullable: true,
+    onDelete: 'CASCADE',
   })
   reminders?: Reminder[];
 }

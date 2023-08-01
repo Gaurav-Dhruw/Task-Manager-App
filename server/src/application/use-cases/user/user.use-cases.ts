@@ -24,6 +24,7 @@ export class UserUseCases {
     if (!this.hashService.verify(inputUser.password, user.password))
       throw new UnauthorizedException('User Unauthorized');
 
+    delete user.password;  
     return user;
   }
 
@@ -49,5 +50,9 @@ export class UserUseCases {
   getUsersByIds(users: User[]): Promise<User[]> {
     const users_ids = users.map((user) => user.id);
     return this.dataService.user.getByIds(users_ids);
+  }
+
+  getAllUsers(){
+    return this.dataService.user.getAll();
   }
 }

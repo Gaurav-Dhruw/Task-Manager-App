@@ -24,7 +24,7 @@ export class TeamUseCases {
     const team = await this.dataService.team.getById(id);
 
     this.helper.validateInput(team);
-    this.helper.checkAuthorization(team,requestUser);
+    this.helper.checkAuthorization(team, requestUser);
 
     return team;
   }
@@ -40,13 +40,15 @@ export class TeamUseCases {
     return this.dataService.team.create(teamInput);
   }
 
-  async updateTeam(teamInput: Team, requestUser: User): Promise<Team> {
-    const team = await this.dataService.team.getById(teamInput.id);
+  async updateTeam(inputTeam: Team, requestUser: User): Promise<Team> {
+    const team = await this.dataService.team.getById(inputTeam.id);
 
     this.helper.validateInput(team);
     this.helper.checkAuthorization(team, requestUser);
 
-    return this.dataService.team.update(teamInput.id, teamInput);
+    const updatedTeam = { ...team, ...inputTeam };
+
+    return this.dataService.team.update(inputTeam.id, updatedTeam);
   }
 
   async addMembers(
@@ -62,7 +64,7 @@ export class TeamUseCases {
 
     this.helper.validateInput(team);
     this.helper.checkAuthorization(team, requestUser);
-    this.helper.checkAdminAccess(team,requestUser);
+    this.helper.checkAdminAccess(team, requestUser);
 
     this.helper.checkIfValidUsers(usersList, inputUsers);
     team.members = this.helper.mergeUsersList(team.members, inputUsers);
@@ -80,7 +82,7 @@ export class TeamUseCases {
     this.helper.validateInput(team);
     this.helper.checkAuthorization(team, requestUser);
     this.helper.checkAdminAccess(team, requestUser);
-    
+
     this.helper.checkIfTeamMembers(team, removalList);
     this.helper.checkIfTeamAdmins(team, removalList);
 
@@ -106,16 +108,14 @@ export class TeamUseCases {
     this.helper.validateInput(team);
     this.helper.checkAuthorization(team, requestUser);
     this.helper.checkAdminAccess(team, requestUser);
-    
+
     this.helper.checkIfTeamMembers(team, inputUsers);
     team.admins = this.helper.mergeUsersList(team.admins, inputUsers);
 
     return this.dataService.team.update(team.id, team);
   }
 
- 
-
-  async deleteTeam(id: string,user:User): Promise<void> {
+  async deleteTeam(id: string, user: User): Promise<void> {
     const team = await this.dataService.team.getById(id);
 
     this.helper.validateInput(team);

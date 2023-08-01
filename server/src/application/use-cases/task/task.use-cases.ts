@@ -11,7 +11,7 @@ export class TaskUseCases {
   ) {}
 
   // Done
-  getTasks(user_id: string): Promise<Task[]> {
+  getAllTasks(user_id: string): Promise<Task[]> {
     return this.dataService.task.getAllWhereUser(user_id);
   }
 }

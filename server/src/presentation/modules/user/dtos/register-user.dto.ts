@@ -1,3 +1,4 @@
+import { OmitType } from '@nestjs/mapped-types';
 import {
   IsEmail,
   IsNotEmpty,
@@ -22,18 +23,19 @@ export class RegisterUserDto {
   password: string;
 }
 
-export class RegisterUserResponseDto {
-  id: string;
-  email: string;
-  name: string;
-  profile_pic?: string;
+export class RegisterUserResponseDto extends OmitType(User,['password']){
+
+
   token: string;
 
   constructor(options?: Partial<User> & { token?: string }) {
-    this.id = options?.id ?? this.id;
-    this.email = options?.email ?? this.email;
-    this.name = options?.name ?? this.name;
-    this.profile_pic = options?.profile_pic ? options.profile_pic : null;
-    this.token  = options?.token ?? this.token;
+      super();
+     this.id = options?.id ?? this.id;
+     this.email = options?.email ?? this.email;
+     this.name = options?.name ?? this.name;
+     this.profile_pic = options?.profile_pic ? options.profile_pic : null;
+     this.tasks = options?.tasks ?? this.tasks;
+     this.teams = options?.teams ?? this.teams;
+     this.token = options?.token ?? this.token;
   }
 }

@@ -1,6 +1,5 @@
 import { Task, Team } from './';
 
-
 export class User {
   id: string;
   email: string;
@@ -8,8 +7,9 @@ export class User {
   password: string;
   profile_pic?: string;
   teams?: Team[];
+  tasks?: Task[];
 
-  constructor(data?: Partial<User>) {
-    Object.assign(this,data);
+  constructor(options?: Partial<User>) {
+    Object.assign(this, options);
   }
 }

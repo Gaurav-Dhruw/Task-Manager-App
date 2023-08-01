@@ -6,29 +6,18 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Task, Team, User } from 'src/domain/entities';
+import { AuthorizationHelper } from './authorization.helper';
+import { ValidateInputHelper } from './validate-input.helper';
+import { ValidateOperationHelper } from './validate-operation.helper';
 
 @Injectable()
 export class TeamTaskHelper {
+  constructor(
+    private readonly authorization: AuthorizationHelper,
+    private readonly validateInput: ValidateInputHelper,
+    private readonly validateOperation: ValidateOperationHelper,
+  ) {}
   //General Helpers
-  validateInput(task: Task): void {
-    if (!task?.team) throw new NotFoundException('Task Not Found');
-  }
-
-
-
-  checkAuthorization(team: Team, user: User): void {
-    const isMember = !!team.members.find((member) => member.id === user.id);
-    if (!isMember) throw new UnauthorizedException('User Unauthorized');
-  }
-
-  checkSpecialAuthorization(task: Task, team: Team, user: User) {
-    const isAdmin = !!team.admins.find((admin) => admin.id === user.id);
-    const isCreator = task.created_by.id === user.id;
-
-    if (!(isAdmin || isCreator))
-      throw new ForbiddenException('User Do Not Have Required Access');
-  }
-
   filterUsersList(filterFrom: User[], matchList: User[]) {
     const updatedList = filterFrom.filter(
       (curr) => !matchList.find((user) => user.id === curr.id),
@@ -45,15 +34,71 @@ export class TeamTaskHelper {
     return resultantList;
   }
 
-  // Create Use-Case Helpers
-  validateCreateInput(team: Team): void {
-    if (!team) throw new NotFoundException('Team Not Found');
+  // Get All Use-Case Helpers
+
+  validateGetAllInput(team: Team): void {
+    if (!this.validateInput.isValidTeam(team))
+      throw new NotFoundException('Team Not Found');
   }
 
-  // Basic Update Use-Case Helpers
+  // Get Use-Case Helpers
+  validateGetInput(team: Team, task: Task): void {
+    const errorMsgs: string[] = [];
 
+    if (!this.validateInput.isValidTask(task)) errorMsgs.push('Team Not Found');
+    if (!this.validateInput.isValidTeam(team)) errorMsgs.push('Task Not Found');
+
+    if (errorMsgs.length > 0) throw new NotFoundException(errorMsgs);
+  }
+
+  validateGetOperation(team: Team, task: Task): void {
+    const isTeamTask = this.validateOperation.isTeamTask(task);
+    const taskBelongsToTheTeam = this.validateOperation.taskBelongsToTheTeam(
+      team,
+      task,
+    );
+    if (!isTeamTask || !taskBelongsToTheTeam) throw new BadRequestException();
+  }
+
+  // Create Use-Case Helpers
+  validateCreateInput(team: Team): void {
+    if (!this.validateInput.isValidTeam(team))
+      throw new NotFoundException('Team Not Found');
+  }
+
+  // Common Use-Case Helpers
+
+  checkAuthorization(team: Team, user: User) {
+    if (!this.authorization.isTeamMember(team, user))
+      throw new UnauthorizedException('User Unauthorized');
+  }
+
+  checkSpecialAuthorization(team: Team, task: Task, user: User) {
+    const isCreator = this.authorization.isTaskCreator(task, user);
+    const isAdmin = this.authorization.isTeamAdmin(team, user);
+
+    if (!isAdmin || !isCreator)
+      throw new ForbiddenException('Special Access Required');
+  }
+
+  validateMutateInput(team: Team, task: Task): void {
+    const errorMsgs: string[] = [];
+    if (!this.validateInput.isValidTeam(team)) errorMsgs.push('Team Not Found');
+    if (!this.validateInput.isValidTask(task)) errorMsgs.push('Task Not Found');
+    
+    if (errorMsgs.length > 0) throw new NotFoundException(errorMsgs);
+  }
+
+  validateMutateOperation(team:Team, task:Task){
+    const isTeamTask = this.validateOperation.isTeamTask(task);
+    const taskBelongsToTheTeam = this.validateOperation.taskBelongsToTheTeam(
+      team,
+      task,
+    );
+    if (!isTeamTask || !taskBelongsToTheTeam) throw new BadRequestException();
+  }
+  
   // Assignment Use-Case Helpers
-
   checkIfTeamMembers(team: Team, usersList: User[]): void {
     const members = team.members;
     const areTeamMembers = usersList.every(
@@ -64,5 +109,5 @@ export class TeamTaskHelper {
       throw new BadRequestException('Invalid/Unauthorized Users Provided');
   }
 
-  // Delete Use-Case Helpers
+  
 }

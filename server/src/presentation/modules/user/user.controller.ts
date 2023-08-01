@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Get,
   Patch,
   Post,
   Req,
@@ -16,6 +17,7 @@ import {
   RegisterUserResponseDto,
   UpdateUserDto,
   UpdateUserCredentialsDto,
+  UpdateUserResponseDto,
 } from './dtos';
 import { UserUseCases } from 'src/application/use-cases/user/user.use-cases';
 import { ITokenService } from 'src/domain/abstracts';
@@ -29,6 +31,11 @@ export class UserController {
     private readonly tokenService: ITokenService,
   ) {}
 
+  @Get('get-all')
+  findAllUsers() {
+    return this.userUserCases.getAllUsers();
+  }
+
   @Post('login')
   async loginUser(
     @Body() userDto: LoginUserDto,
@@ -36,7 +43,7 @@ export class UserController {
     const userInput = new User(userDto);
     const user = await this.userUserCases.loginUser(userInput);
     const token = this.tokenService.generateToken(user);
-
+    console.log(user);
     return new LoginUserResponseDto({ ...user, token });
   }
 
@@ -57,7 +64,7 @@ export class UserController {
     const inputUser = new User(userDto);
     const requestUser = new User(req.user);
     const user = await this.userUserCases.updateUser(inputUser, requestUser);
-    return console.log(user);
+    return new UpdateUserResponseDto(user);
   }
 
   @Patch('update/credentials')

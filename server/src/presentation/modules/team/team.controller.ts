@@ -18,6 +18,7 @@ import {
   CreateTeamDto,
   RemoveTeamMembersDto,
   UpdateTeamDto,
+  UpdateTeamResponseDto,
 } from './dtos';
 import { CustomRequest } from 'src/presentation/common/types';
 import { UpdateDtoValidationPipe } from 'src/presentation/common/pipes';
@@ -42,7 +43,7 @@ export class TeamController {
     return this.teamUseCases.getTeamsWhereUser(req.user?.id);
   }
 
-  @Post('create')
+  @Post('')
   async createTeam(@Req() req: CustomRequest, @Body() teamDto: CreateTeamDto) {
     const team = new Team(teamDto);
     const requestUser = new User(req.user);
@@ -50,11 +51,15 @@ export class TeamController {
   }
 
   @UsePipes(new UpdateDtoValidationPipe(['team_name']))
-  @Patch('update')
-  async updateTeam(@Req() req: CustomRequest, @Body() teamDto: UpdateTeamDto) {
+  @Patch()
+  async updateTeam(
+    @Req() req: CustomRequest,
+    @Body() teamDto: UpdateTeamDto,
+  ): Promise<UpdateTeamResponseDto> {
     const team = new Team(teamDto);
     const requestUser = new User(req.user);
-    return this.teamUseCases.updateTeam(team, requestUser);
+    const updatedTeam = await this.teamUseCases.updateTeam(team, requestUser);
+    return new UpdateTeamResponseDto(updatedTeam);
   }
 
   @Patch('members/add')
@@ -99,13 +104,13 @@ export class TeamController {
   //   );
   // }
 
-  // @Delete('delete/:id')
-  // async deleteTeam(
-  //   @Req() req: CustomRequest,
-  //   @Param('id', ParseUUIDPipe) id: string,
-  // ): Promise<void> {
-  //   const requestUser = new User(req.user);
-  //   await this.teamUseCases.deleteTeam(id, requestUser);
-  //   return;
-  // }
+  @Delete(':id')
+  async deleteTeam(
+    @Req() req: CustomRequest,
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<void> {
+    const requestUser = new User(req.user);
+    await this.teamUseCases.deleteTeam(id, requestUser);
+    return;
+  }
 }

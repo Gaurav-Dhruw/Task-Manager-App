@@ -12,7 +12,7 @@ export class Task {
   assigned_to: User[];
   team?: Team;
   comments?: Comment[];
-  reminder?: Reminder;
+  reminders?: Reminder[];
 
   constructor(data?: Partial<Task>) {
     Object.assign(this, data);

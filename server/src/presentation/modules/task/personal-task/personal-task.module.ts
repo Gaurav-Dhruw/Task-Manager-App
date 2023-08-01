@@ -1,8 +1,8 @@
 import { Module } from "@nestjs/common";
+import { PersonalTaskController } from "./personal-task.controller";
 
 
 @Module({
-    providers:[],
-    exports:[],
+    controllers:[PersonalTaskController],
 })
 export class PersonalTaskModule{}

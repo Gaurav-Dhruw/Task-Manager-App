@@ -15,8 +15,8 @@ export class TeamTaskUseCases {
   ) {}
 
   // Done
-  async createTask(inputTask: Task, requestUser: User): Promise<Task> {
-    const team = await this.dataService.team.getById(inputTask.team.id);
+  async createTask(inputTask: Task, team_id:string, requestUser: User): Promise<Task> {
+    const team = await this.dataService.team.getById(team_id);
     // Checks the team actually exists or not.
     this.helper.validateCreateInput(team);
     // Checks if user is a memeber or not
@@ -27,18 +27,56 @@ export class TeamTaskUseCases {
   }
 
   // Done
-  getTasks(user_id: string): Promise<Task[]> {
-    return this.dataService.task.getAllWhereUser(user_id);
+  async getAllTasks(team_id: string, requestUser:User): Promise<Task[]> {
+    const team = await this.dataService.team.getById(team_id);
+
+    // Checks the team actually exists or not.
+    this.helper.validateGetAllInput(team);
+    // Checks if user is a memeber or not
+    this.helper.checkAuthorization(team, requestUser);
+
+    return team.tasks;
   }
 
   // Done
-  async updateTask(inputTask: Task, requestUser: User): Promise<Task> {
-    const task = await this.dataService.task.getById(inputTask.id);
+  async getTask(
+    task_id: string,
+    team_id: string,
+    requestUser: User,
+  ): Promise<Task> {
+    const [task, team] = await Promise.all([
+      await this.dataService.task.getById(task_id),
+      await this.dataService.team.getById(team_id),
+    ]);
 
-    // Validate team task.
-    this.helper.validateInput(task);
+    // Checks the team and task actually exists or not.
+    this.helper.validateGetInput(team, task);
 
-    const team = await this.dataService.team.getById(task.team.id);
+    // Checks if provide task is indeed a team task and belongs to provided team;
+    this.helper.validateGetOperation(team, task);
+
+    // Checks if user is a memeber or not
+    this.helper.checkAuthorization(team, requestUser);
+
+    return task;
+  }
+
+  // Done
+  async updateTask(
+    inputTask: Task,
+    team_id: string,
+    requestUser: User,
+  ): Promise<Task> {
+    const [task, team] = await Promise.all([
+      await this.dataService.task.getById(inputTask.id),
+      await this.dataService.team.getById(team_id),
+    ]);
+
+    // Validate team and task.
+    this.helper.validateMutateInput(team, task);
+    // Checks if provide task is indeed a team task and belongs to provided team;
+    this.helper.validateMutateOperation(team, task);
+    
     // Checks for required authorization.
     this.helper.checkAuthorization(team, requestUser);
 
@@ -49,19 +87,24 @@ export class TeamTaskUseCases {
 
   // Done
   async assignTask(
-    id: string,
+    task_id: string,
     assign: User[],
+    team_id: string,
     requestUser: User,
   ): Promise<Task> {
-    const task = await this.dataService.task.getById(id);
+    const [task, team] = await Promise.all([
+      await this.dataService.task.getById(task_id),
+      await this.dataService.team.getById(team_id),
+    ]);
     // Validate team task.
-    this.helper.validateInput(task);
+    this.helper.validateMutateInput(team, task);
+    // Checks if provide task is indeed a team task and belongs to provided team;
+    this.helper.validateMutateOperation(team, task);
 
-    const team = await this.dataService.team.getById(task.team.id);
     //Checks if user is team member.
     this.helper.checkAuthorization(team, requestUser);
     // Checks if the user is either an admin or task creator.
-    this.helper.checkSpecialAuthorization(task, team, requestUser);
+    this.helper.checkSpecialAuthorization(team, task, requestUser);
 
     // Checks if the provided users are team members or not.
     this.helper.checkIfTeamMembers(team, assign);
@@ -72,24 +115,30 @@ export class TeamTaskUseCases {
     );
 
     task.assigned_to = newAssignedList;
-    return this.dataService.task.update(id, task);
+    return this.dataService.task.update(task_id, task);
   }
 
   // Done
   async unassignTask(
-    id: string,
+    task_id: string,
     unassign: User[],
+    team_id: string,
     requestUser: User,
   ): Promise<Task> {
-    const task = await this.dataService.task.getById(id);
-    // Validate team task.
-    this.helper.validateInput(task);
-
-    const team = await this.dataService.team.getById(task.team.id);
+    const [task, team] = await Promise.all([
+      await this.dataService.task.getById(task_id),
+      await this.dataService.team.getById(team_id),
+    ]);
+    // Validate team and task.
+    this.helper.validateMutateInput(team, task);
+    // Checks if provide task is indeed a team task and belongs to provided team;
+    this.helper.validateMutateOperation(team, task);
+    
+    
     //Checks if user is team member.
     this.helper.checkAuthorization(team, requestUser);
     // Checks if the user is either an admin or task creator.
-    this.helper.checkSpecialAuthorization(task, team, requestUser);
+    this.helper.checkSpecialAuthorization(team, task, requestUser);
 
     // Checks if the provided users are team members or not.
     this.helper.checkIfTeamMembers(team, unassign);
@@ -100,21 +149,30 @@ export class TeamTaskUseCases {
     );
 
     task.assigned_to = newAssignedList;
-    return this.dataService.task.update(id, task);
+    return this.dataService.task.update(task_id, task);
   }
 
   //Done
-  async deleteTask(id: string, requestUser: User): Promise<void> {
-    const task = await this.dataService.task.getById(id);
-    // Validate team task.
-    this.helper.validateInput(task);
+  async deleteTask(
+    task_id: string,
+    team_id: string,
+    requestUser: User,
+  ): Promise<void> {
+    const [task, team] = await Promise.all([
+      await this.dataService.task.getById(task_id),
+      await this.dataService.team.getById(team_id),
+    ]);
+    // Validate team  and task.
+    this.helper.validateMutateInput(team, task);
 
-    const team = await this.dataService.team.getById(task.team.id);
+    // Checks if provide task is indeed a team task and belongs to provided team;
+    this.helper.validateMutateOperation(team, task);
+
     //Checks if user is team member.
     this.helper.checkAuthorization(team, requestUser);
     //Checks if the user is either an admin or task creator
-    this.helper.checkSpecialAuthorization(task, team, requestUser);
+    this.helper.checkSpecialAuthorization(team, task, requestUser);
 
-    await this.dataService.task.delete(id);
+    await this.dataService.task.delete(task_id);
   }
 }

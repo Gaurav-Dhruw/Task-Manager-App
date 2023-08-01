@@ -13,7 +13,7 @@ export class TaskRepository implements ITaskRepository {
   getById(id: string): Promise<Task> {
     return this.taskRepository.findOne({
       where: { id },
-      relations: ['assigned_to', 'created_by', 'team', 'comments'],
+      relations: ['assigned_to', 'created_by', 'team', 'comments', 'reminders'],
     });
   }
   getAll(): Promise<Task[]> {

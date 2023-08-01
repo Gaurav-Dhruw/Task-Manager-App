@@ -10,6 +10,6 @@ export class TaskController {
 
   @Get()
   getTasks(@Req() req: CustomRequest): Promise<Task[]> {
-    return this.taskUseCases.getTasks(req.user.id);
+    return this.taskUseCases.getAllTasks(req.user.id);
   }
 }

@@ -20,7 +20,7 @@ export class User {
   @Column()
   name: string;
 
-  @Column()
+  @Column({ select: false })
   password: string;
 
   @Column({
@@ -33,4 +33,6 @@ export class User {
   })
   teams?: Team[];
 
+  @ManyToMany(() => Task, (task) => task.assigned_to, { nullable: true })
+  tasks?: Task[];
 }

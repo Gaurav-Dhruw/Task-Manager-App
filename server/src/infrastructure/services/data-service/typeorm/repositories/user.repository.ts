@@ -13,21 +13,22 @@ export class UserRepository implements IUserRepository {
   getByEmail(email: string): Promise<User> {
     return this.userRepository.findOne({
       where: { email },
-      relations: {
-        teams: {},
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        password: true,
+        profile_pic: true,
       },
+      relations: ['tasks', 'teams'],
     });
   }
   getById(id: string): Promise<User> {
-    return this.userRepository.findOne({ 
-      where: { 
-        id 
-      }, 
-      select: {
-        password:false,
-      
-      }
-   });
+    return this.userRepository.findOne({
+      where: {
+        id,
+      },
+    });
   }
 
   getByIds(ids: string[]): Promise<User[]> {
@@ -36,10 +37,11 @@ export class UserRepository implements IUserRepository {
     });
   }
   getAll(): Promise<User[]> {
-    return this.userRepository.find();
+    return this.userRepository.find({ relations: ['tasks', 'teams'] });
   }
+
   create(user: User): Promise<User> {
-    return this.userRepository.save(user,{reload:true});
+    return this.userRepository.save(user, { reload: true });
   }
   update(id: string, user: User): Promise<User> {
     return this.userRepository.save(user);
