@@ -8,7 +8,7 @@ export class NotificationController {
   constructor(private readonly notificationUseCases: NotificationUseCases) {}
 
   @Get()
-  getAllNotifications(@Req() req: CustomRequest): Promise<Notification[]> {
+  findAllNotifications(@Req() req: CustomRequest): Promise<Notification[]> {
     const requestedUser = new User(req.user);
     return this.notificationUseCases.getAllNotifications(requestedUser.id);
   }

@@ -26,12 +26,12 @@ export class PersonalTaskController {
   constructor(private readonly taskUseCases: PersonalTaskUseCases) {}
   
   @Get()
-  getAllTasks(@Req() req: CustomRequest): Promise<Task[]> {
+  findAllTasks(@Req() req: CustomRequest): Promise<Task[]> {
     return this.taskUseCases.getAssignedTasks(req.user.id);
   }
 
   @Get(':task_id')
-  async getPersonalTask(
+  async findPersonalTask(
     @Req() req: CustomRequest,
     @Param('task_id', ParseUUIDPipe) task_id: string,
   ): Promise<GetPersonalTaskResponseDto> {

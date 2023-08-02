@@ -37,7 +37,7 @@ export class TeamTaskController {
   }
 
   @Get()
-  findTeamTasks(
+  findAllTeamTasks(
     @Req() req: CustomRequest,
     @Param('team_id', ParseUUIDPipe) team_id: string,
   ): Promise<Task[]> {

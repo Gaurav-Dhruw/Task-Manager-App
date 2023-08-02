@@ -7,53 +7,34 @@ import {
 } from '@nestjs/common';
 import { Comment, Task, Team, User } from 'src/domain/entities';
 import { AuthorizationHelper } from './authorization.helper';
-import { ValidateInputHelper } from './validate-input.helper';
-import { ValidateOperationHelper } from './validate-operation-helper';
 
 @Injectable()
 export class CommentUseCasesHelper {
   constructor(
     private readonly authorizationHelper: AuthorizationHelper,
-    private readonly validateInputHelper: ValidateInputHelper,
-    private readonly validateOperationHelper: ValidateOperationHelper,
   ) {}
+    // Create/Read Use-Case Helpers
+  validateCRInput(team: Team, task: Task) {
+    const errorMsgs: string[] = [];
 
-  validateCreateInput(team: Team, task: Task): void {
-    this.validateInputHelper.validateTask(task);
-    this.validateInputHelper.validateTeam(team);
-  }
-  validateCreateOperation(team: Team, task: Task) {
-    const isTeamTask = this.validateOperationHelper.isTeamTask(task);
-    const taskBelongsToTheTeam =
-      this.validateOperationHelper.taskBelongsToTheTeam(task, team);
+    if (!task) errorMsgs.push('Task Not Found');
+    if (!team) errorMsgs.push('Team Not Found');
 
-    if (!isTeamTask || !taskBelongsToTheTeam) throw new BadRequestException();
+    if (errorMsgs.length > 0) throw new NotFoundException(errorMsgs);
   }
 
-  validateReadInput(team: Team, task: Task) {
-    this.validateInputHelper.validateTask(task);
-    this.validateInputHelper.validateTeam(team);
+  validateCROperation(team: Team, task: Task) {
+    const taskBelongsToTheTeam = task.team?.id === team?.id;
+    if (!taskBelongsToTheTeam) throw new BadRequestException();
   }
-
-  validateReadOperation(team: Team, task: Task) {
-    const isTeamTask = this.validateOperationHelper.isTeamTask(task);
-    const taskBelongsToTheTeam =
-      this.validateOperationHelper.taskBelongsToTheTeam(task, team);
-
-    if (!isTeamTask || !taskBelongsToTheTeam) throw new BadRequestException();
-  }
-  checkReadAuthorization(team: Team, user: User) {
-    const isMember = this.authorizationHelper.isMember(team, user);
+  checkCRAuthorization(team: Team, user: User) {
+    const isMember = this.authorizationHelper.isTeamMember(team, user);
     if (!isMember) throw new UnauthorizedException('User Unauthorized');
   }
 
+  // Mutate Use-Case Helpers
   validateMutateInput(comment: Comment): void {
-    this.validateInputHelper.validateComment(comment);
-  }
-
-  checkCreateAuthorization(team: Team, user: User) {
-    const isMember = this.authorizationHelper.isMember(team, user);
-    if (!isMember) throw new UnauthorizedException('User Unauthorized');
+    if (!comment)  throw new NotFoundException('Comment Not Found');
   }
 
   checkMutateAuthorization(comment: Comment, user: User) {

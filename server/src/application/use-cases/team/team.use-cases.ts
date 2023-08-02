@@ -29,7 +29,7 @@ export class TeamUseCases {
     return team;
   }
 
-  getTeamsWhereUser(user_id: string): Promise<Team[]> {
+  getAllTeams(user_id: string): Promise<Team[]> {
     return this.dataService.team.getAllWhereUser(user_id);
   }
 

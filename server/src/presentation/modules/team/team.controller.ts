@@ -42,8 +42,8 @@ export class TeamController {
   }
 
   @Get()
-  findTeams(@Req() req: CustomRequest) {
-    return this.teamUseCases.getTeamsWhereUser(req.user?.id);
+  findAllTeams(@Req() req: CustomRequest) {
+    return this.teamUseCases.getAllTeams(req.user?.id);
   }
 
   @Post()
