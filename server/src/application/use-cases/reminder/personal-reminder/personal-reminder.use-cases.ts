@@ -9,55 +9,75 @@ export class PersonalReminderUseCases {
     private readonly dataService: IDataService,
     private readonly helper: PersonalReminderHelper,
   ) {}
+
   //Done
   async createReminder(
-    reminderInput: Reminder,
+    inputReminder: Reminder,
     requestUser: User,
   ): Promise<Reminder> {
-    const inputTask = reminderInput.task;
-    const schedule = reminderInput.scheduled_for;
-    const task = await this.dataService.task.getById(inputTask.id);
+    const task_id = inputReminder.task.id;
+    const schedule = inputReminder.scheduled_for;
+    const task = await this.dataService.task.getById(task_id);
 
-    // Checks if valid task is provided
+    // Checks if valid task is provided.
     this.helper.validateCreateInput(task);
+    // Checks for team tasks.
+    this.helper.validateCreateOperation(task);
 
     // Checks if user is the creator of the task
     this.helper.isTaskCreator(task, requestUser);
 
     // Validates schedule if its an upcomming date/time or not.
-    this.helper.validateOperation(schedule);
+    this.helper.validateReminderSchedule(schedule);
 
-    reminderInput.receivers = task.assigned_to;
-    return this.dataService.reminder.create(reminderInput);
+    inputReminder.receivers = task.assigned_to;
+    return this.dataService.reminder.create(inputReminder);
   }
 
   //Done
   async updateReminder(
-    id: string,
-    reschedule: Date,
+    inputReminder: Reminder,
+    task_id: string,
     requestUser: User,
   ): Promise<Reminder> {
-    const reminder = await this.dataService.reminder.getById(id);
-    // Checks if the reminder exists.
-    this.helper.validateInput(reminder);
+    const { id: reminder_id, scheduled_for: reschedule } = inputReminder;
 
-    const task = await this.dataService.task.getById(reminder.task.id);
+    const [reminder, task] = await Promise.all([
+      await this.dataService.reminder.getById(reminder_id),
+      await this.dataService.task.getById(task_id),
+    ]);
+
+    // Checks if the reminder and task exists.
+    this.helper.validateMutateInput(reminder, task);
+
+    // Checks if the reminder belongs to the provided task.
+    this.helper.validateMutateOperation(reminder, task);
 
     // Checks if user is creator of the task.
     this.helper.isTaskCreator(task, requestUser);
 
+    // Validates schedule if its an upcomming date/time or not.
+    this.helper.validateReminderSchedule(reschedule);
+
     reminder.scheduled_for = reschedule;
-    return this.dataService.reminder.update(id, reminder);
+    return this.dataService.reminder.update(reminder_id, reminder);
   }
 
   //Done
-  async deleteReminder(id: string, requestUser: User): Promise<void> {
-    const reminder = await this.dataService.reminder.getById(id);
-    // Checks if the reminder exists.
-    this.helper.validateInput(reminder);
+  async deleteReminder(
+    id: string,
+    task_id: string,
+    requestUser: User,
+  ): Promise<void> {
+    const [reminder, task] = await Promise.all([
+      await this.dataService.reminder.getById(id),
+      await this.dataService.task.getById(task_id),
+    ]);
 
-    const task = await this.dataService.task.getById(reminder?.task.id);
-
+    // Checks if the reminder and task exists.
+    this.helper.validateMutateInput(reminder, task);
+    // Checks if the reminder belongs to the provided task.
+    this.helper.validateMutateOperation(reminder, task);
     // If it a reminder of individual task.
     this.helper.isTaskCreator(task, requestUser);
 

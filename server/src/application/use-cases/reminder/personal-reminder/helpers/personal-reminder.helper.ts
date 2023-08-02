@@ -10,23 +10,21 @@ import { Reminder, Task, Team, User } from 'src/domain/entities';
 export class PersonalReminderHelper {
   constructor() {}
   // General Helpers
-  validateInput(reminder: Reminder) {
-    if (!reminder) throw new NotFoundException('Reminder Not Found');
+  validateMutateInput(reminder: Reminder, task: Task) {
+    const errorMsgs: string[] = [];
+    if (!reminder) errorMsgs.push('Reminder Not Found');
+    if (!task) errorMsgs.push('Task Not Found');
+
+    if (errorMsgs.length > 0) throw new NotFoundException(errorMsgs);
   }
 
-  validateOperation(schedule: Date): void {
+  validateMutateOperation(reminder:Reminder, task:Task): void {
+    if (reminder?.task.id !== task?.id) throw new BadRequestException();
+  }
+
+  validateReminderSchedule(schedule: Date) {
     if (new Date(schedule) <= new Date())
       throw new BadRequestException('Past Scheduling Time');
-  }
-
-  checkTeamReminderAuthorization(task: Task, requestUser: User): void {
-    const isTaskCreator = task.created_by.id === requestUser.id;
-    const isAssigned: boolean = !!task?.assigned_to.find(
-      (user) => user.id === requestUser.id,
-    );
-
-    if (!isTaskCreator || !isAssigned)
-      throw new UnauthorizedException('User Unauthorized');
   }
 
   isTaskCreator(task: Task, requestUser: User) {
@@ -37,5 +35,8 @@ export class PersonalReminderHelper {
   // Create Use-Case Helpers
   validateCreateInput(task: Task): void {
     if (!task) throw new NotFoundException('Task Not Found');
+  }
+  validateCreateOperation(task:Task):void{
+    if(task && task.team) throw new BadRequestException();
   }
 }

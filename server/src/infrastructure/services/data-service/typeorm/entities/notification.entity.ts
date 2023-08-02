@@ -6,7 +6,7 @@ export class Notification {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { onDelete: 'CASCADE' })
   receiver: User;
 
   @Column()

@@ -45,8 +45,8 @@ export class TeamTaskHelper {
   validateGetInput(team: Team, task: Task): void {
     const errorMsgs: string[] = [];
 
-    if (!this.validateInput.isValidTask(task)) errorMsgs.push('Team Not Found');
-    if (!this.validateInput.isValidTeam(team)) errorMsgs.push('Task Not Found');
+    if (!this.validateInput.isValidTask(task)) errorMsgs.push('Task Not Found');
+    if (!this.validateInput.isValidTeam(team)) errorMsgs.push('Team Not Found');
 
     if (errorMsgs.length > 0) throw new NotFoundException(errorMsgs);
   }
@@ -66,9 +66,19 @@ export class TeamTaskHelper {
       throw new NotFoundException('Team Not Found');
   }
 
+  // Update Use-Case Helpers
+
+  checkTaskLevelAuthorization(team: Team, task: Task, user: User) {
+    const isAssignedToTask = this.authorization.isAssignedToTask(task, user);
+    const isCreator = this.authorization.isTaskCreator(task, user);
+    const isAdmin = this.authorization.isTeamAdmin(team, user);
+
+    if (!isAssignedToTask && !isAdmin && !isCreator) throw new ForbiddenException('Access Not Allowed');
+  }
+
   // Common Use-Case Helpers
 
-  checkAuthorization(team: Team, user: User) {
+  checkTeamLevelAuthorization(team: Team, user: User) {
     if (!this.authorization.isTeamMember(team, user))
       throw new UnauthorizedException('User Unauthorized');
   }
@@ -77,7 +87,7 @@ export class TeamTaskHelper {
     const isCreator = this.authorization.isTaskCreator(task, user);
     const isAdmin = this.authorization.isTeamAdmin(team, user);
 
-    if (!isAdmin || !isCreator)
+    if (!isAdmin && !isCreator)
       throw new ForbiddenException('Special Access Required');
   }
 
@@ -85,11 +95,11 @@ export class TeamTaskHelper {
     const errorMsgs: string[] = [];
     if (!this.validateInput.isValidTeam(team)) errorMsgs.push('Team Not Found');
     if (!this.validateInput.isValidTask(task)) errorMsgs.push('Task Not Found');
-    
+
     if (errorMsgs.length > 0) throw new NotFoundException(errorMsgs);
   }
 
-  validateMutateOperation(team:Team, task:Task){
+  validateMutateOperation(team: Team, task: Task) {
     const isTeamTask = this.validateOperation.isTeamTask(task);
     const taskBelongsToTheTeam = this.validateOperation.taskBelongsToTheTeam(
       team,
@@ -97,7 +107,7 @@ export class TeamTaskHelper {
     );
     if (!isTeamTask || !taskBelongsToTheTeam) throw new BadRequestException();
   }
-  
+
   // Assignment Use-Case Helpers
   checkIfTeamMembers(team: Team, usersList: User[]): void {
     const members = team.members;
@@ -108,6 +118,4 @@ export class TeamTaskHelper {
     if (!areTeamMembers)
       throw new BadRequestException('Invalid/Unauthorized Users Provided');
   }
-
-  
 }

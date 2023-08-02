@@ -1,12 +1,9 @@
 import { OmitType, PartialType } from '@nestjs/mapped-types';
 import { CreateTeamDto } from './create-team.dto';
-import { IsNotEmpty, IsUUID } from 'class-validator';
 import { Team } from 'src/domain/entities';
 
 export class UpdateTeamDto extends PartialType(CreateTeamDto) {
-  @IsUUID()
-  @IsNotEmpty()
-  id: string;
+ 
 }
 
 export class UpdateTeamResponseDto extends OmitType(Team,['tasks','admins','members']){

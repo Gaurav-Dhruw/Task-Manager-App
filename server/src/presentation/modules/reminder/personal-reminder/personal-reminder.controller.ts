@@ -1,44 +1,60 @@
-import { Body, Controller, Delete, Param, ParseUUIDPipe, Patch, Post, Req } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+  Req,
+} from '@nestjs/common';
 import { CustomRequest } from 'src/presentation/common/types';
 import { UpdateReminderDto, createReminderDto } from '../dtos';
-import { Reminder, User } from 'src/domain/entities';
+import { Reminder, Task, User } from 'src/domain/entities';
 import { PersonalReminderUseCases } from 'src/application/use-cases/reminder/personal-reminder/personal-reminder.use-cases';
 
-@Controller('reminder')
+@Controller('user/task/:task_id/reminder')
 export class PersonalReminderController {
   constructor(private readonly reminderUserCases: PersonalReminderUseCases) {}
 
-  @Post('create')
+  @Post()
   createReminder(
     @Req() req: CustomRequest,
+    @Param('task_id', ParseUUIDPipe) task_id: string,
     @Body() reminderDto: createReminderDto,
   ) {
     const reminder = new Reminder(reminderDto);
+    reminder.task = new Task({ id: task_id });
     const requestUser = new User(req.user);
-    return this.reminderUserCases.createReminder(reminder,requestUser);
+    return this.reminderUserCases.createReminder(reminder, requestUser);
   }
-  @Patch('update')
+  @Patch()
   updateReminder(
     @Req() req: CustomRequest,
+    @Param('task_id', ParseUUIDPipe) task_id: string,
     @Body() reminderDto: UpdateReminderDto,
   ) {
-    const id = reminderDto.id,
-    rescheduleFor = reminderDto.scheduled_for;
+    const inputReminder = new Reminder(reminderDto);
     const requestUser = new User(req.user);
     return this.reminderUserCases.updateReminder(
-      id,
-      rescheduleFor,
+      inputReminder,
+      task_id,
       requestUser,
     );
   }
 
-  @Delete(':id')
+  @Delete(':reminder_id')
   async deleteReminder(
     @Req() req: CustomRequest,
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('task_id', ParseUUIDPipe) task_id: string,
+    @Param('reminder_id', ParseUUIDPipe) reminder_id: string,
   ) {
-    const requestedUser = new User(req.user);
-    await this.reminderUserCases.deleteReminder(id, requestedUser);
+    const requestUser = new User(req.user);
+    await this.reminderUserCases.deleteReminder(
+      reminder_id,
+      task_id,
+      requestUser,
+    );
     return;
   }
 }

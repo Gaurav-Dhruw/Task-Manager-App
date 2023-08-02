@@ -32,10 +32,13 @@ export class TeamController {
   //   return this.teamUseCases.getAllTeams();
   // }
 
-  @Get(':id')
-  findTeam(@Req() req: CustomRequest, @Param('id', ParseUUIDPipe) id: string) {
+  @Get(':team_id')
+  findTeam(
+    @Req() req: CustomRequest,
+    @Param('team_id', ParseUUIDPipe) team_id: string,
+  ) {
     const requestUser = new User(req.user);
-    return this.teamUseCases.getTeam(id, requestUser);
+    return this.teamUseCases.getTeam(team_id, requestUser);
   }
 
   @Get()
@@ -43,74 +46,71 @@ export class TeamController {
     return this.teamUseCases.getTeamsWhereUser(req.user?.id);
   }
 
-  @Post('')
-  async createTeam(@Req() req: CustomRequest, @Body() teamDto: CreateTeamDto) {
-    const team = new Team(teamDto);
+  @Post()
+  async createTeam(
+    @Req() req: CustomRequest,
+    @Param('team_id', ParseUUIDPipe) team_id: string,
+    @Body() teamDto: CreateTeamDto,
+  ) {
+    const team = new Team({ ...teamDto, id: team_id });
     const requestUser = new User(req.user);
     return this.teamUseCases.createTeam(team, requestUser);
   }
 
   @UsePipes(new UpdateDtoValidationPipe(['team_name']))
-  @Patch()
+  @Patch(':team_id')
   async updateTeam(
     @Req() req: CustomRequest,
+    @Param('team_id', ParseUUIDPipe) team_id: string,
     @Body() teamDto: UpdateTeamDto,
   ): Promise<UpdateTeamResponseDto> {
-    const team = new Team(teamDto);
+    const team = new Team({ ...teamDto, id: team_id });
     const requestUser = new User(req.user);
     const updatedTeam = await this.teamUseCases.updateTeam(team, requestUser);
     return new UpdateTeamResponseDto(updatedTeam);
   }
 
-  @Patch('members/add')
-  addMemebers(@Req() req: CustomRequest, @Body() teamDto: AddTeamMembersDto) {
+  @Patch(':team_id/members/add')
+  addMemebers(
+    @Req() req: CustomRequest,
+    @Param('team_id', ParseUUIDPipe) team_id: string,
+    @Body() teamDto: AddTeamMembersDto,
+  ) {
     const requestUser = new User(req.user);
-    return this.teamUseCases.addMembers(
-      teamDto.id,
-      teamDto.members,
-      requestUser,
-    );
+    return this.teamUseCases.addMembers(team_id, teamDto.members, requestUser);
   }
 
-  @Patch('members/remove')
+  @Patch(':team_id/members/remove')
   removeMembers(
     @Req() req: CustomRequest,
+    @Param('team_id', ParseUUIDPipe) team_id: string,
     @Body() teamDto: RemoveTeamMembersDto,
   ) {
     const requestUser = new User(req.user);
     return this.teamUseCases.removeMembers(
-      teamDto.id,
+      team_id,
       teamDto.members,
       requestUser,
     );
   }
 
-  @Patch('admins/add')
-  makeAdmin(@Req() req: CustomRequest, @Body() teamDto: AddTeamAdminsDto) {
+  @Patch(':team_id/admins/add')
+  makeAdmin(
+    @Req() req: CustomRequest,
+    @Param('team_id', ParseUUIDPipe) team_id: string,
+    @Body() teamDto: AddTeamAdminsDto,
+  ) {
     const requestUser = new User(req.user);
-    return this.teamUseCases.makeAdmin(teamDto.id, teamDto.admins, requestUser);
+    return this.teamUseCases.makeAdmin(team_id, teamDto.admins, requestUser);
   }
 
-  // @Patch('admins/remove')
-  // removeAdmins(
-  //   @Req() req: CustomRequest,
-  //   @Body() teamDto: RemoveTeamAdminsDto,
-  // ) {
-  //   const requestUser = new User(req.user);
-  //   return this.teamUseCases.removeAdmins(
-  //     teamDto.id,
-  //     teamDto.admins,
-  //     requestUser,
-  //   );
-  // }
-
-  @Delete(':id')
+  @Delete(':team_id')
   async deleteTeam(
     @Req() req: CustomRequest,
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('team_id', ParseUUIDPipe) team_id: string,
   ): Promise<void> {
     const requestUser = new User(req.user);
-    await this.teamUseCases.deleteTeam(id, requestUser);
+    await this.teamUseCases.deleteTeam(team_id, requestUser);
     return;
   }
 }

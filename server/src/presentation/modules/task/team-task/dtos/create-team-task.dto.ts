@@ -35,8 +35,4 @@ export class CreateTeamTaskDto
   @IsOptional()
   priority?: Priority;
 
-  @ValidateNested()
-  @Type(() => GenericEntityDto)
-  @IsObject()
-  team: Team;
 }

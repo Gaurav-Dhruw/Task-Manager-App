@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Get,
@@ -43,7 +42,6 @@ export class UserController {
     const userInput = new User(userDto);
     const user = await this.userUserCases.loginUser(userInput);
     const token = this.tokenService.generateToken(user);
-    console.log(user);
     return new LoginUserResponseDto({ ...user, token });
   }
 
@@ -59,11 +57,13 @@ export class UserController {
   }
 
   @UsePipes(new UpdateDtoValidationPipe(['name']))
-  @Patch('update')
+  @Patch()
   async updateUser(@Req() req: CustomRequest, @Body() userDto: UpdateUserDto) {
     const inputUser = new User(userDto);
-    const requestUser = new User(req.user);
-    const user = await this.userUserCases.updateUser(inputUser, requestUser);
+    inputUser.id = req.user.id;
+
+    const user = await this.userUserCases.updateUser(inputUser);
+
     return new UpdateUserResponseDto(user);
   }
 
@@ -74,8 +74,5 @@ export class UserController {
     return;
   }
 
-  // @Post('find-by-ids')
-  // findUsersByIds(@Body('users') users: User[]) {
-  //   return this.userUserCases.getUsersByIds(users);
-  // }
+
 }

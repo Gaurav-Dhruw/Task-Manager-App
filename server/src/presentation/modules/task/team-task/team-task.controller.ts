@@ -27,7 +27,7 @@ export class TeamTaskController {
   constructor(private readonly taskUseCases: TeamTaskUseCases) {}
 
   @Get(':task_id')
-  getTeamTask(
+  findTeamTask(
     @Req() req: CustomRequest,
     @Param('team_id', ParseUUIDPipe) team_id: string,
     @Param('task_id', ParseUUIDPipe) task_id: string,
@@ -37,7 +37,7 @@ export class TeamTaskController {
   }
 
   @Get()
-  getTeamTasks(
+  findTeamTasks(
     @Req() req: CustomRequest,
     @Param('team_id', ParseUUIDPipe) team_id: string,
   ): Promise<Task[]> {
@@ -49,6 +49,7 @@ export class TeamTaskController {
   createTask(
     @Req() req: CustomRequest,
     @Param('team_id', ParseUUIDPipe) team_id: string,
+
     @Body() taskDto: CreateTeamTaskDto,
   ): Promise<Task> {
     const requestUser = new User(req.user);
@@ -57,49 +58,53 @@ export class TeamTaskController {
   }
 
   @UsePipes(new UpdateDtoValidationPipe(['status', 'title']))
-  @Patch('update')
+  @Patch(':task_id')
   async updateTask(
     @Req() req: CustomRequest,
     @Param('team_id', ParseUUIDPipe) team_id: string,
+    @Param('task_id', ParseUUIDPipe) task_id: string,
+
     @Body() taskDto: UpdateTeamTaskDto,
   ): Promise<UpdateTeamTaskResponseDto> {
     const requestUser = new User(req.user);
-    const task = new Task(taskDto);
+    const task = new Task({...taskDto, id:task_id});
     const updatedTask = await this.taskUseCases.updateTask(
       task,
       team_id,
       requestUser,
     );
-    const res = new UpdateTeamTaskResponseDto(updatedTask);
-    console.log(res);
-    return res;
+
+    return new UpdateTeamTaskResponseDto(updatedTask);
   }
 
-  @Patch('/assign')
+  @Patch(':task_id/assign')
   assignTask(
     @Req() req: CustomRequest,
     @Param('team_id', ParseUUIDPipe) team_id: string,
+    @Param('task_id', ParseUUIDPipe) task_id: string,
+
     @Body() taskDto: AssignToTaskDto,
   ): Promise<Task> {
     const requestUser = new User(req.user);
     return this.taskUseCases.assignTask(
-      taskDto.id,
+      task_id,
       taskDto.assign,
       team_id,
       requestUser,
     );
   }
 
-  @Patch('/unassign')
+  @Patch(':task_id/unassign')
   unassignTask(
     @Req() req: CustomRequest,
     @Param('team_id', ParseUUIDPipe) team_id: string,
+    @Param('task_id', ParseUUIDPipe) task_id: string,
 
     @Body() taskDto: UnassignFromTaskDto,
   ): Promise<Task> {
     const requestUser = new User(req.user);
     return this.taskUseCases.unassignTask(
-      taskDto.id,
+      task_id,
       taskDto.unassign,
       team_id,
       requestUser,

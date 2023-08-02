@@ -24,6 +24,11 @@ import { PersonalTaskUseCases } from 'src/application/use-cases/task/personal-ta
 @Controller('user/task')
 export class PersonalTaskController {
   constructor(private readonly taskUseCases: PersonalTaskUseCases) {}
+  
+  @Get()
+  getAllTasks(@Req() req: CustomRequest): Promise<Task[]> {
+    return this.taskUseCases.getAssignedTasks(req.user.id);
+  }
 
   @Get(':task_id')
   async getPersonalTask(
@@ -38,22 +43,22 @@ export class PersonalTaskController {
   @Post()
   createPersonalTask(
     @Req() req: CustomRequest,
-    @Body() personalTaskDto: CreatePersonalTaskDto,
+    @Body() taskDto: CreatePersonalTaskDto,
   ): Promise<Task> {
     const requestUser = new User(req.user);
-    const personalTask = new Task(personalTaskDto);
-    return this.taskUseCases.createTask(personalTask, requestUser);
+    const taskInput = new Task(taskDto);
+    return this.taskUseCases.createTask(taskInput, requestUser);
   }
 
-
   @UsePipes(new UpdateDtoValidationPipe(['status', 'title']))
-  @Patch()
+  @Patch(':task_id')
   async updateTask(
     @Req() req: CustomRequest,
-    @Body() personalTaskDto: UpdatePersonalTaskDto,
+    @Param('task_id', ParseUUIDPipe) task_id: string,
+    @Body() taskDto: UpdatePersonalTaskDto,
   ): Promise<UpdatePersonalTaskResponseDto> {
     const requestUser = new User(req.user);
-    const personalTask = new Task(personalTaskDto);
+    const personalTask = new Task({...taskDto, id:task_id});
     const updatedTask = await this.taskUseCases.updateTask(
       personalTask,
       requestUser,
@@ -66,7 +71,7 @@ export class PersonalTaskController {
   @Delete(':task_id')
   async deletePersonalTask(
     @Req() req: CustomRequest,
-    @Param('id', ParseUUIDPipe) task_id: string,
+    @Param('task_id', ParseUUIDPipe) task_id: string,
   ): Promise<void> {
     const requestUser = new User(req.user);
     await this.taskUseCases.deleteTask(task_id, requestUser);

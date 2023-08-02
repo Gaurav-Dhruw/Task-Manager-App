@@ -5,11 +5,8 @@ import { CreateTeamTaskDto } from './create-team-task.dto';
 import { OmitType, PartialType } from '@nestjs/mapped-types';
 
 export class UpdateTeamTaskDto extends PartialType(
-  OmitType(CreateTeamTaskDto, ['team']),
+  CreateTeamTaskDto,
 ) {
-  @IsUUID()
-  @IsNotEmpty()
-  id: string;
 
   @IsEnum(Status)
   @IsOptional()

@@ -48,13 +48,11 @@ export class Task {
 
   @OneToMany(() => Comment, (comment) => comment.task, {
     nullable: true,
-    onDelete: 'CASCADE',
   })
   comments?: Comment[];
 
   @OneToMany(() => Reminder, (reminder) => reminder.task, {
     nullable: true,
-    onDelete: 'CASCADE',
   })
   reminders?: Reminder[];
 }

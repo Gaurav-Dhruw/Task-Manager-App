@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
+import { TeamTaskController } from './team-task.controller';
 
 @Module({
-  providers: [],
-  exports: [],
+  controllers: [TeamTaskController],
 })
 export class TeamTaskModule {}

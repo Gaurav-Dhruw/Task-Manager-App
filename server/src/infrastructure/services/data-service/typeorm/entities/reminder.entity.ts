@@ -4,7 +4,6 @@ import {
   JoinTable,
   ManyToMany,
   ManyToOne,
-
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Task, User } from './';
@@ -18,7 +17,7 @@ export class Reminder {
   @JoinTable()
   receivers: User[];
 
-  @ManyToOne(() => Task, (task) => task.reminders)
+  @ManyToOne(() => Task, (task) => task.reminders, { onDelete: 'CASCADE' })
   task: Task;
 
   @Column()

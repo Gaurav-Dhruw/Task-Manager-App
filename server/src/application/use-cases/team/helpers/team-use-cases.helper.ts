@@ -76,6 +76,6 @@ export class TeamUseCasesHelper {
   // Delete Use-Case Helpers
 
   validateDeleteOperation(team: Team) {
-    if (team.members.length > 0) throw new ForbiddenException('Not Allowed');
+    if (team.members.length > 1) throw new ForbiddenException('Not Allowed');
   }
 }

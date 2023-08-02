@@ -9,7 +9,7 @@ export class UpdateDtoValidationPipe implements PipeTransform {
   }
   transform(dto: any) {
     console.log(dto);
-    if (Object.keys(dto).length <= 1)
+    if (Object.keys(dto).length < 1)
       throw new BadRequestException('No valid fields to update');
     else if (this.options) {
       const errorMsgs: string[] = [];

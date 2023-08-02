@@ -35,7 +35,6 @@ export class Team {
 
   @OneToMany(() => Task, (task) => task.team, {
     nullable: true,
-    onDelete:'CASCADE'
   })
   tasks?: Task[];
 }

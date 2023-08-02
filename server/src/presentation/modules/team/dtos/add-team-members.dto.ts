@@ -4,9 +4,7 @@ import { User } from 'src/domain/entities';
 import { GenericEntityDto } from 'src/presentation/common/dtos';
 
 export class AddTeamMembersDto {
-  @IsUUID()
-  @IsNotEmpty()
-  id: string;
+
 
   @ValidateNested({each:true})
   @Type(()=>GenericEntityDto)

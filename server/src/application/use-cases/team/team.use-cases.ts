@@ -42,7 +42,7 @@ export class TeamUseCases {
 
   async updateTeam(inputTeam: Team, requestUser: User): Promise<Team> {
     const team = await this.dataService.team.getById(inputTeam.id);
-
+    // console.log(inputTeam, requestUser);
     this.helper.validateInput(team);
     this.helper.checkAuthorization(team, requestUser);
 
@@ -120,7 +120,7 @@ export class TeamUseCases {
 
     this.helper.validateInput(team);
     this.helper.validateDeleteOperation(team);
-    this.helper.checkAdminAccess(team, user);
+    this.helper.checkAuthorization(team, user);
 
     await this.dataService.team.delete(team.id);
   }

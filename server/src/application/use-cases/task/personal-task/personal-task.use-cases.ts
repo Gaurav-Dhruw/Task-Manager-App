@@ -15,6 +15,11 @@ export class PersonalTaskUseCases {
   ) {}
 
   // Done
+  getAssignedTasks(user_id: string): Promise<Task[]> {
+    return this.dataService.task.getAllWhereUser(user_id);
+  }
+
+  // Done
   async createTask(inputTask: Task, requestUser: User): Promise<Task> {
     inputTask.created_by = requestUser;
     inputTask.assigned_to = [requestUser];

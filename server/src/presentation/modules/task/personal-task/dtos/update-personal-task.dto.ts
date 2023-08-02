@@ -5,9 +5,6 @@ import { CreatePersonalTaskDto } from './create-personal-task.dto';
 import {  OmitType, PartialType } from '@nestjs/mapped-types';
 
 export class UpdatePersonalTaskDto extends PartialType(CreatePersonalTaskDto) {
-  @IsUUID()
-  @IsNotEmpty()
-  id: string;
 
   @IsEnum(Status)
   @IsOptional()

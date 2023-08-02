@@ -4,9 +4,7 @@ import { RegisterUserDto } from './register-user.dto';
 import { User } from 'src/domain/entities';
 
 export class UpdateUserDto {
-  @IsUUID()
-  @IsNotEmpty()
-  id: string;
+
 
   @IsOptional()
   @IsString()

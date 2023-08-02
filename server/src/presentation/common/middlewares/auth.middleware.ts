@@ -18,9 +18,7 @@ export class AuthMiddleware implements NestMiddleware {
     try {
       const token = req.headers?.authorization?.split(' ')[1];
       if (!token) throw new UnauthorizedException('Access Token Not Present');
-      // console.log(token);
       const requestUser = this.tokenService.decodeToken(token);
-      // console.log(user);
       if (!requestUser || !requestUser.id)
         throw new UnauthorizedException('Invalid Token');
 

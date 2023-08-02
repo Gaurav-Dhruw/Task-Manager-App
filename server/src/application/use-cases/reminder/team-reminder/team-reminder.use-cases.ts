@@ -11,69 +11,80 @@ export class TeamReminderUseCases {
   ) {}
   //Done
   async createReminder(
-    reminderInput: Reminder,
+    inputReminder: Reminder,
     team_id: string,
     requestUser: User,
   ): Promise<Reminder> {
-    const inputTask = reminderInput.task;
-    const schedule = reminderInput.scheduled_for;
+    const task_id = inputReminder.task?.id;
+    const schedule = inputReminder.scheduled_for;
     const [task, team] = await Promise.all([
-      await this.dataService.task.getById(inputTask.id),
+      await this.dataService.task.getById(task_id),
       await this.dataService.team.getById(team_id),
     ]);
 
-    // Checks if valid task is provided
-    this.helper.validateCreateInput(task, team);
+    // Checks if valid task and team is provided
+    this.helper.validateCreateInput(team, task);
+    // Checks for team task and their enitities connection.
+    this.helper.validateCreateOperation(team, task);
 
     // Checks if user is either the task creator or task assgined user.
-    this.helper.checkAuthorization(team,task, requestUser);
+    this.helper.checkAuthorization(team, task, requestUser);
 
     // Validates schedule if its an upcomming date/time or not.
-    this.helper.validateOperation(schedule);
+    this.helper.validateReminderSchedule(schedule);
 
-    reminderInput.receivers = task.assigned_to;
-    return this.dataService.reminder.create(reminderInput);
+    inputReminder.receivers = task.assigned_to;
+    return this.dataService.reminder.create(inputReminder);
   }
 
   //Done
   async updateReminder(
-    reminderInput:Reminder,
-    team_id:string,
+    inputReminder: Reminder,
+    task_id: string,
+    team_id: string,
     requestUser: User,
   ): Promise<Reminder> {
+    const { id: reminder_id } = inputReminder;
+
     const [reminder, task, team] = await Promise.all([
-      await this.dataService.reminder.getById(reminderInput.id),
-      await this.dataService.task.getById(reminderInput.task.id),
+      await this.dataService.reminder.getById(reminder_id),
+      await this.dataService.task.getById(task_id),
       await this.dataService.team.getById(team_id),
     ]);
-    
-    // Checks if the reminder exists.
-    this.helper.validateInput(team , task, reminder);
 
- 
-      // Checks if user is either the task creator or task assgined user.
-      this.helper.checkAuthorization(team,task, requestUser);
-  
+    // Checks if the reminder exists.
+    this.helper.validateMutateInput(team, task, reminder);
+    // Checks for team task and each enitities connection.
+    this.helper.validateMutateOperation(team, task, reminder);
+
+    // Checks if user is either the task creator or task assgined user.
+    this.helper.checkAuthorization(team, task, requestUser);
+
     // If it a reminder of individual task.
 
     return this.dataService.reminder.update(reminder.id, reminder);
   }
 
   //Done
-  async deleteReminder(id: string,team_id:string, task_id:string, requestUser: User): Promise<void> {
-   const [reminder, task, team] = await Promise.all([
-     await this.dataService.reminder.getById(id),
-     await this.dataService.task.getById(task_id),
-     await this.dataService.team.getById(team_id),
-   ]);
-    
+  async deleteReminder(
+    reminder_id: string,
+    task_id: string,
+    team_id: string,
+    requestUser: User,
+  ): Promise<void> {
+    const [reminder, task, team] = await Promise.all([
+      await this.dataService.reminder.getById(reminder_id),
+      await this.dataService.task.getById(task_id),
+      await this.dataService.team.getById(team_id),
+    ]);
     // Checks if the reminder exists.
-    this.helper.validateInput(team,task,reminder);
+    this.helper.validateMutateInput(team, task, reminder);
+    // Checks for team task and each enitities connection.
+    this.helper.validateMutateOperation(team, task, reminder);
 
+    // Checks if user is either the task creator or task assgined user.
+    this.helper.checkAuthorization(team, task, requestUser);
 
-      // Checks if user is either the task creator or task assgined user.
-      this.helper.checkAuthorization(team,task, requestUser);
-  
-    await this.dataService.reminder.delete(id);
+    await this.dataService.reminder.delete(reminder_id);
   }
 }

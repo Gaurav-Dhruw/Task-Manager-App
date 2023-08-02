@@ -37,13 +37,11 @@ export class UserUseCases {
     return this.dataService.user.create(inputUser);
   }
 
-  async updateUser(inputUser: User, requestUser: User): Promise<User> {
-    const user = await this.dataService.user.getById(inputUser?.id);
-
-    this.helper.validateInput(user);
-    this.helper.checkAuthorization(user, requestUser);
+  async updateUser(inputUser: User): Promise<User> {
+    const user = await this.dataService.user.getById(inputUser.id);
 
     const updatedUser = { ...user, ...inputUser };
+
     return this.dataService.user.update(inputUser.id, updatedUser);
   }
 

@@ -6,6 +6,6 @@ import { TaskUseCases } from './task.use-cases';
 @Module({
   imports: [PersonalTaskUseCasesModule, TeamTaskUseCasesModule],
   providers: [TaskUseCases],
-  exports: [PersonalTaskUseCasesModule, TeamTaskUseCasesModule],
+  exports: [PersonalTaskUseCasesModule, TeamTaskUseCasesModule, TaskUseCases],
 })
 export class TaskUseCasesModule {}
