@@ -23,16 +23,17 @@ export class NotificationRepository implements INotificationRepository {
 
   getAllWhereUser(
     user_id: string,
-    paginationOption?: { page: number, limit:number },
+    options?: { take: number; skip: number },
   ): Promise<Notification[]> {
-    const {limit, page} = paginationOption;
+    const { skip = 0, take = 0 } = options || {};
     return this.notificationRepository.find({
       where: {
         receiver: { id: user_id },
       },
       relations: ['receiver'],
-      take: limit || 10,
-      skip: (page-1)*limit || 0,
+      order: { created_at: 'DESC' },
+      take: take || 10,
+      skip: (skip - 1) * take,
     });
   }
 

@@ -16,4 +16,9 @@ export class Notification {
     default: false,
   })
   is_read: boolean;
+
+  @Column({
+    default: ()=>'NOW()',
+  })
+  created_at: Date;
 }

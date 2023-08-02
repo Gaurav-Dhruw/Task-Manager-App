@@ -20,17 +20,22 @@ export class NotificationUseCases {
   }
 
   //Done
-  async markAsRead(id: string, requestUser: User): Promise<Notification> {
-    const notification = await this.dataService.notification.getById(id);
+  async markAsRead(
+    notification_id: string,
+    requestUser: User,
+  ): Promise<Notification> {
+    const notification = await this.dataService.notification.getById(
+      notification_id,
+    );
 
     // Checks if notification exists.
     this.helper.validateInput(notification);
 
-    // Checks if the notificatio belongs to the usern
+    // Checks if the notification belongs to the usern
     this.helper.checkAuthorization(notification, requestUser);
 
     notification.is_read = true;
-    return this.dataService.notification.update(id, notification);
+    return this.dataService.notification.update(notification_id, notification);
   }
 
   // Needs operation check.
@@ -47,8 +52,13 @@ export class NotificationUseCases {
   }
 
   //Done
-  async deleteNotification(id: string, requestUser: User): Promise<void> {
-    const notification = await this.dataService.notification.getById(id);
+  async deleteNotification(
+    notification_id: string,
+    requestUser: User,
+  ): Promise<void> {
+    const notification = await this.dataService.notification.getById(
+      notification_id,
+    );
 
     // Checks if notification exists.
     this.helper.validateInput(notification);
@@ -56,6 +66,6 @@ export class NotificationUseCases {
     // Checks if the notificatio belongs to the usern
     this.helper.checkAuthorization(notification, requestUser);
 
-    await this.dataService.notification.delete(id);
+    await this.dataService.notification.delete(notification_id);
   }
 }
