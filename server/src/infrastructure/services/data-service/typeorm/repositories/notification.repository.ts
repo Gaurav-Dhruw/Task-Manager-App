@@ -17,23 +17,34 @@ export class NotificationRepository implements INotificationRepository {
       relations: ['receiver'],
     });
   }
-  getAll(): Promise<Notification[]> {
-    return this.notificationRepository.find({ relations: ['receiver'] });
-  }
 
-  getAllWhereUser(
-    user_id: string,
-    options?: { take: number; skip: number },
-  ): Promise<Notification[]> {
-    const { skip = 0, take = 0 } = options || {};
+  getAll(options?: {
+    user_id?: string;
+    skip?:number;
+    take?:number;
+  }): Promise<Notification[]> {
+    const {
+      user_id,
+
+    } = options || {};
     return this.notificationRepository.find({
       where: {
         receiver: { id: user_id },
       },
       relations: ['receiver'],
+      select: {
+        id: true,
+        content: true,
+        receiver: {
+          id: true,
+          name: true,
+          email: true,
+        },
+        created_at: true,
+      },
       order: { created_at: 'DESC' },
-      take: take || 10,
-      skip: (skip - 1) * take,
+      // take: take || 10,
+      // skip: (skip - 1) * take,
     });
   }
 
@@ -41,11 +52,15 @@ export class NotificationRepository implements INotificationRepository {
     return this.notificationRepository.save(notification);
   }
 
+  createMany(notifications: Notification[]): Promise<Notification[]> {
+    return this.notificationRepository.save(notifications);
+  }
+
   update(id: string, notification: Notification): Promise<Notification> {
     return this.notificationRepository.save(notification);
   }
 
-  updateAll(notifications: Notification[]): Promise<Notification[]> {
+  updateMany(notifications: Notification[]): Promise<Notification[]> {
     return this.notificationRepository.save(notifications);
   }
 

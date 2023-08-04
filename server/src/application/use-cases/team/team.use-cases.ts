@@ -30,7 +30,7 @@ export class TeamUseCases {
   }
 
   getAllTeams(user_id: string): Promise<Team[]> {
-    return this.dataService.team.getAllWhereUser(user_id);
+    return this.dataService.team.getAll({user_id});
   }
 
   async createTeam(teamInput: Team, requestUser: User): Promise<Team> {

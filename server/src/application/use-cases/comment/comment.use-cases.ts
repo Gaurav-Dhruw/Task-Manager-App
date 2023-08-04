@@ -50,7 +50,7 @@ export class CommentUseCases {
     // checks if user is a team memeber.
     this.helper.checkCRAuthorization(team, requestUser);
 
-    return this.dataService.comment.getAllWhereTask(task_id);
+    return this.dataService.comment.getAll({task_id});
   }
 
   //Done

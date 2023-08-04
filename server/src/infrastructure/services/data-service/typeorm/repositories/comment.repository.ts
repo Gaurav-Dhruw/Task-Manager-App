@@ -13,26 +13,52 @@ export class CommentRepository implements ICommentRepository {
 
   getById(id: string): Promise<Comment> {
     return this.commentRepository.findOne({
-      where: { id },
+      where: {
+        id,
+      },
+
       relations: ['user', 'task'],
+
+      select: {
+        id: true,
+        content: true,
+        user: {
+          id: true,
+        },
+        task: {
+          id: true,
+        },
+      },
     });
-  }
-  getAll(): Promise<Comment[]> {
-    return this.commentRepository.find({ relations: ['user', 'task'] });
   }
 
-  getAllWhereTask(task_id: string): Promise<Comment[]> {
+  getAll(options?: { task_id: string; user_id: string }): Promise<Comment[]> {
+    const { task_id, user_id } = options || {};
+
     return this.commentRepository.find({
-      where: { task: { id: task_id } },
-      order: { created_at: 'DESC' },
+      where: {
+        user: {
+          id: user_id,
+        },
+        task: {
+          id: task_id,
+        },
+      },
+
+      order: {
+        created_at: 'DESC',
+      },
     });
   }
+
   create(comment: Comment): Promise<Comment> {
     return this.commentRepository.save(comment);
   }
+
   update(id: string, comment: Comment): Promise<Comment> {
     return this.commentRepository.save(comment);
   }
+
   async delete(id: string): Promise<void> {
     await this.commentRepository.delete(id);
   }

@@ -1,8 +1,9 @@
 import { Task } from '../entities';
 import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { LessThanOrEqual, Repository } from 'typeorm';
 import { ITaskRepository } from 'src/domain/abstracts';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Priority, Status } from 'src/domain/types';
 
 @Injectable()
 export class TaskRepository implements ITaskRepository {
@@ -16,21 +17,39 @@ export class TaskRepository implements ITaskRepository {
       relations: ['assigned_to', 'created_by', 'team', 'comments', 'reminders'],
     });
   }
-  getAll(): Promise<Task[]> {
-    return this.taskRepository.find();
-  }
 
-  getAllWhereUser(user_id: string): Promise<Task[]> {
+
+  getAll(options?:{user_id?: string, title?:string, status?:Status, priority?:Priority, deadline?:Date}): Promise<Task[]> {
+
+    const {
+      user_id,
+      title,
+      status,
+      priority,
+      deadline,
+    } = options || {};
+
     return this.taskRepository.find({
-      where: { assigned_to: { id: user_id } },
+      where: { 
+        title,
+        assigned_to: { 
+          id: user_id 
+        },
+        status,
+        priority,
+        deadline: LessThanOrEqual(deadline)
+      },
     });
   }
+
   create(task: Task): Promise<Task> {
     return this.taskRepository.save(task);
   }
+
   update(id: string, task: Task): Promise<Task> {
     return this.taskRepository.save(task);
   }
+  
   async delete(id: string): Promise<void> {
     await this.taskRepository.delete(id);
   }

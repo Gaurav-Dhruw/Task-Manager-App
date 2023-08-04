@@ -16,7 +16,7 @@ export class NotificationUseCases {
 
   //Done
   async getAllNotifications(user_id: string): Promise<Notification[]> {
-    return this.dataService.notification.getAllWhereUser(user_id);
+    return this.dataService.notification.getAll({ user_id });
   }
 
   //Done
@@ -40,15 +40,16 @@ export class NotificationUseCases {
 
   // Needs operation check.
   async markAllAsRead(user_id: string): Promise<Notification[]> {
-    const notifications = await this.dataService.notification.getAllWhereUser(
+    const notifications = await this.dataService.notification.getAll({
       user_id,
-    );
+      is_read:false,
+    });
 
     notifications.forEach((notification) => {
       notification.is_read = true;
     });
 
-    return this.dataService.notification.updateAll(notifications);
+    return this.dataService.notification.updateMany(notifications);
   }
 
   //Done

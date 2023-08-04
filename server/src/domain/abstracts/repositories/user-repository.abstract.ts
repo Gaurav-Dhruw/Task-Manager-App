@@ -2,7 +2,7 @@ import { User } from 'src/domain/entities';
 import { IGenericRepository } from '.';
 
 export abstract class IUserRepository implements IGenericRepository<User> {
-  abstract getAll(): Promise<User[]>;
+  abstract getAll(options?:{name?:string, email?:string}): Promise<User[]>;
   abstract getById(id: string): Promise<User>;
   abstract getByIds(ids: string[]): Promise<User[]>;
 
