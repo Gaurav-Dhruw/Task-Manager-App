@@ -1,7 +1,7 @@
-import { Notification } from 'src/domain/entities';
+import { EmailTemplate } from 'src/domain/types';
 
 export abstract class IEmailNotificationService {
-  abstract sendWelcomeMail(data: Notification): Promise<void>;
-  abstract sendConfirmationMail(data: Notification): Promise<void>;
-  abstract sendReminderMail(data: Notification): void;
+  abstract sendMail(data: EmailTemplate): Promise<void>;
+  // abstract sendConfirmationMail(data: EmailTemplate): Promise<void>;
+  // abstract sendReminderMail(data: EmailTemplate): Promise<void>;
 }

@@ -8,7 +8,7 @@ import {
   UsePipes,
 } from '@nestjs/common';
 
-import { User } from 'src/domain/entities';
+import { Notification, Reminder, Task, User } from 'src/domain/entities';
 import {
   LoginUserDto,
   LoginUserResponseDto,
@@ -19,20 +19,58 @@ import {
   UpdateUserResponseDto,
 } from './dtos';
 import { UserUseCases } from 'src/application/use-cases/user/user.use-cases';
-import { ITokenService } from 'src/domain/abstracts';
+import { INotificationService, ITokenService } from 'src/domain/abstracts';
 import { CustomRequest } from 'src/presentation/common/types';
 import { UpdateDtoValidationPipe } from 'src/presentation/common/pipes';
+import { ReminderUseCases } from 'src/application/use-cases/reminder/reminder.use-cases';
+import { ReminderTemplate } from 'src/domain/types';
 
 @Controller('user')
 export class UserController {
   constructor(
-    private readonly userUserCases: UserUseCases,
+    private readonly userUseCases: UserUseCases,
     private readonly tokenService: ITokenService,
+    private readonly notificationService: INotificationService,
+    private readonly reminderUseCases: ReminderUseCases,
   ) {}
 
   @Get('get-all')
   findAllUsers() {
-    return this.userUserCases.getAllUsers();
+    return this.userUseCases.getAllUsers();
+  }
+
+  @Get('email-testing')
+  sendReminderEmail() {
+    // const notification = this.reminderUseCases.remindersToNotifications([
+    //   new Reminder({
+    //     receivers: [
+    //       new User({ name: 'Test Name', email: 'raxstargd@gmail.com' }),
+    //     ],
+    //     scheduled_for: new Date(),
+    //     task: new Task({ title: 'Test Task' }),
+    //   }),
+    // ])[0];
+    // console.log('controller', notification);
+
+    const templateString = this.notificationService.toTemplateString({
+      title: 'Task Reminder',
+      template: 'reminder',
+      context: {
+        username: 'Rax',
+        task_name: 'Long Pending Task',
+        reminder_schedule: new Date(),
+      },
+    } as ReminderTemplate);
+    console.log(templateString);
+    return this.notificationService.email.sendMail({
+      to: 'raxstargd@gmail.com',
+      title: 'Task Reminder',
+      subject: 'Task Reminder',
+      template: 'email-template',
+      context: {
+        content: templateString,
+      },
+    });
   }
 
   @Post('login')
@@ -40,7 +78,7 @@ export class UserController {
     @Body() userDto: LoginUserDto,
   ): Promise<LoginUserResponseDto> {
     const userInput = new User(userDto);
-    const user = await this.userUserCases.loginUser(userInput);
+    const user = await this.userUseCases.loginUser(userInput);
     const token = this.tokenService.generateToken(user);
     return new LoginUserResponseDto({ ...user, token });
   }
@@ -50,7 +88,7 @@ export class UserController {
     @Body() userDto: RegisterUserDto,
   ): Promise<RegisterUserResponseDto> {
     const user = new User(userDto);
-    const registeredUser = await this.userUserCases.registerUser(user);
+    const registeredUser = await this.userUseCases.registerUser(user);
     const token = this.tokenService.generateToken(registeredUser);
 
     return new RegisterUserResponseDto({ ...registeredUser, token });
@@ -62,7 +100,7 @@ export class UserController {
     const inputUser = new User(userDto);
     inputUser.id = req.user.id;
 
-    const user = await this.userUserCases.updateUser(inputUser);
+    const user = await this.userUseCases.updateUser(inputUser);
 
     return new UpdateUserResponseDto(user);
   }
@@ -73,6 +111,4 @@ export class UserController {
   ): Promise<void> {
     return;
   }
-
-
 }
