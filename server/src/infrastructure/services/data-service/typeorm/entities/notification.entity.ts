@@ -6,6 +6,9 @@ export class Notification {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Column()
+  title: string;
+
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
   receiver: User;
 
@@ -18,7 +21,7 @@ export class Notification {
   is_read: boolean;
 
   @Column({
-    default: ()=>'NOW()',
+    default: () => 'NOW()',
   })
   created_at: Date;
 }

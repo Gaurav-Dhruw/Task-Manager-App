@@ -2,6 +2,7 @@ import { User } from './';
 
 export class Notification {
   id: string;
+  title: string;
   receiver: User;
   content: string;
   is_read: boolean;

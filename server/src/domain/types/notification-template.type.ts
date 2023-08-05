@@ -1,16 +1,16 @@
 export interface NotificationTemplate {
   title: string;
   template: string;
-  context: {};
+  context: object;
 }
 
 export interface EmailTemplate extends NotificationTemplate {
   subject: string;
   to: string;
 
-  context:{
+  context: {
     content: string;
-  }
+  };
 }
 
 export interface WelcomeTemplate extends NotificationTemplate {
@@ -21,7 +21,7 @@ export interface WelcomeTemplate extends NotificationTemplate {
 
 export interface ConfirmationTemplate extends NotificationTemplate {
   context: {
-    username:string;
+    username: string;
     verification_url: string;
   };
 }

@@ -62,15 +62,17 @@ export class UserController {
       },
     } as ReminderTemplate);
     console.log(templateString);
-    return this.notificationService.email.sendMail({
-      to: 'raxstargd@gmail.com',
-      title: 'Task Reminder',
-      subject: 'Task Reminder',
-      template: 'email-template',
-      context: {
-        content: templateString,
+    return this.notificationService.email.sendMails([
+      {
+        to: 'raxstargd@gmail.com',
+        title: 'Task Reminder',
+        subject: 'Task Reminder',
+        template: 'email-template',
+        context: {
+          content: templateString,
+        },
       },
-    });
+    ]);
   }
 
   @Post('login')
