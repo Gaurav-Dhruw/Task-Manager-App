@@ -6,9 +6,12 @@ import {
   Post,
   Req,
   UsePipes,
+  Redirect,
+  Param,
+  BadGatewayException,
 } from '@nestjs/common';
 
-import { Notification, Reminder, Task, User } from 'src/domain/entities';
+import { User } from 'src/domain/entities';
 import {
   LoginUserDto,
   LoginUserResponseDto,
@@ -22,7 +25,6 @@ import { UserUseCases } from 'src/application/use-cases/user/user.use-cases';
 import { INotificationService, ITokenService } from 'src/domain/abstracts';
 import { CustomRequest } from 'src/presentation/common/types';
 import { UpdateDtoValidationPipe } from 'src/presentation/common/pipes';
-import { ReminderUseCases } from 'src/application/use-cases/reminder/reminder.use-cases';
 import { ReminderTemplate } from 'src/domain/types';
 
 @Controller('user')
@@ -31,7 +33,6 @@ export class UserController {
     private readonly userUseCases: UserUseCases,
     private readonly tokenService: ITokenService,
     private readonly notificationService: INotificationService,
-    private readonly reminderUseCases: ReminderUseCases,
   ) {}
 
   @Get('get-all')
@@ -84,15 +85,32 @@ export class UserController {
     return new LoginUserResponseDto({ ...user, token });
   }
 
+  @Redirect('', 302)
   @Post('sign-up')
   async registerUser(
+    @Req() req: CustomRequest,
     @Body() userDto: RegisterUserDto,
-  ): Promise<RegisterUserResponseDto> {
-    const user = new User(userDto);
-    const registeredUser = await this.userUseCases.registerUser(user);
-    const token = this.tokenService.generateToken(registeredUser);
+  ): Promise<void> {
+    const inputUser = new User(userDto);
+    const baseUrl = req.protocol + '://' + req.get('host');
+    console.log(baseUrl);
+    const registeredUser = await this.userUseCases.registerUser({
+      inputUser,
+      baseUrl,
+    });
+  }
 
-    return new RegisterUserResponseDto({ ...registeredUser, token });
+  @Get('verify/:token')
+  async verfiyUser(
+    @Param('token') token: string,
+  ): Promise<RegisterUserResponseDto> {
+    console.log('verify hit');
+    const payload = this.tokenService.decodeToken(token);
+    if (!payload || !payload.id) throw new BadGatewayException();
+    const inputUser = new User(payload);
+    const user = await this.userUseCases.verifyUser(inputUser);
+    console.log(user);
+    return new RegisterUserResponseDto(user);
   }
 
   @UsePipes(new UpdateDtoValidationPipe(['name']))

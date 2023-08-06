@@ -34,10 +34,12 @@ export class Task {
   @Column({ type: 'enum', enum: Priority, nullable: true })
   priority?: Priority;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, {
+    onDelete: 'SET NULL',
+  })
   created_by: User;
 
-  @ManyToMany(() => User, (user) => user.tasks)
+  @ManyToMany(() => User, (user) => user.tasks, )
   @JoinTable()
   assigned_to: User[];
 

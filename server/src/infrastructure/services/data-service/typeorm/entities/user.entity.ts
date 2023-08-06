@@ -26,7 +26,12 @@ export class User {
   @Column({
     nullable: true,
   })
-  profile_pic: string;
+  profile_pic?: string;
+
+  @Column({
+    default:false,
+  })
+  is_verified: boolean;
 
   @ManyToMany(() => Team, (team) => team.members, {
     nullable: true,

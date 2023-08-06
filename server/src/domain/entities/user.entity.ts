@@ -6,6 +6,7 @@ export class User {
   name: string;
   password: string;
   profile_pic?: string;
+  is_verified: boolean;
   teams?: Team[];
   tasks?: Task[];
 

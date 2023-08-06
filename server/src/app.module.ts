@@ -20,7 +20,7 @@ export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(AuthMiddleware)
-      .exclude('user/login', 'user/sign-up')
+      .exclude('user/login', 'user/sign-up', 'user/verify/:token')
       .forRoutes('user', 'team');
   }
 }
