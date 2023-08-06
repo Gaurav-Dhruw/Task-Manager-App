@@ -8,7 +8,11 @@ import {
   INotificationService,
 } from 'src/domain/abstracts';
 import { Notification, Reminder } from 'src/domain/entities';
-import { EmailTemplate, NotificationTemplate, ReminderTemplate } from 'src/domain/types';
+import {
+  EmailTemplate,
+  NotificationTemplate,
+  ReminderTemplate,
+} from 'src/domain/types';
 
 @Injectable()
 export class NotificationService implements INotificationService {
@@ -41,7 +45,6 @@ export class NotificationService implements INotificationService {
     reminders.forEach((reminder) => {
       reminder.receivers?.forEach((receiver) => {
         const template: ReminderTemplate = {
-          title: "Task Reminder",
           template: 'reminder',
           context: {
             username: receiver.name,
@@ -50,13 +53,13 @@ export class NotificationService implements INotificationService {
           },
         };
         const templateString = this.toTemplateString(template);
-        
+
         const notification = new Notification({
           receiver,
-          title:"Reminder for task " + reminder.task?.title,
+          title: `Reminder for task  "${reminder.task?.title}"`,
           content: templateString,
           created_at: new Date(),
-        })
+        });
 
         notifications.push(notification);
       });
@@ -68,19 +71,18 @@ export class NotificationService implements INotificationService {
   notificationsToEmailOptions(notifications: Notification[]): EmailTemplate[] {
     const emailOptions: EmailTemplate[] = [];
 
-    notifications.forEach(notification=>{
+    notifications.forEach((notification) => {
       const emailOption: EmailTemplate = {
-        template:'email-template',
-        title: "Task Reminder",
         to: notification.receiver?.email,
         subject: notification.title,
-        context:{
-          content:notification.content,
-        }
-      }
+        context: {
+          title: notification.title,
+          content: notification.content,
+        },
+      };
 
       emailOptions.push(emailOption);
-    })
+    });
 
     return emailOptions;
   }

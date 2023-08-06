@@ -28,13 +28,15 @@ export class PersonalReminderController {
     const requestUser = new User(req.user);
     return this.reminderUserCases.createReminder(reminder, requestUser);
   }
-  @Patch()
+  @Patch(':reminder_id')
   updateReminder(
     @Req() req: CustomRequest,
     @Param('task_id', ParseUUIDPipe) task_id: string,
+    @Param('reminder_id', ParseUUIDPipe) reminder_id: string,
+
     @Body() reminderDto: UpdateReminderDto,
   ) {
-    const inputReminder = new Reminder(reminderDto);
+    const inputReminder = new Reminder({ ...reminderDto, id: reminder_id });
     const requestUser = new User(req.user);
     return this.reminderUserCases.updateReminder(
       inputReminder,

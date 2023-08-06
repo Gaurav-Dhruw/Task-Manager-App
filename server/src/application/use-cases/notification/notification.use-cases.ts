@@ -15,6 +15,11 @@ export class NotificationUseCases {
   }
 
   //Done
+  async createNotifications(notifications: Notification[]): Promise<Notification[]> {
+    return this.dataService.notification.createMany(notifications);
+  }
+
+  //Done
   async getAllNotifications(user_id: string): Promise<Notification[]> {
     return this.dataService.notification.getAll({ user_id });
   }
@@ -42,7 +47,7 @@ export class NotificationUseCases {
   async markAllAsRead(user_id: string): Promise<Notification[]> {
     const notifications = await this.dataService.notification.getAll({
       user_id,
-      is_read:false,
+      is_read: false,
     });
 
     notifications.forEach((notification) => {

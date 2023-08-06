@@ -11,10 +11,9 @@ export class EmailNotificationService implements IEmailNotificationService {
     Promise.all(
       emailOptions.map((option) => {
         const {
-          title,
           to,
           subject,
-          context: { content },
+          context: { content , title},
         } = option || {};
 
         return this.mailerService.sendMail({

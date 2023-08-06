@@ -34,15 +34,16 @@ export class TeamReminderController {
       requestUser,
     );
   }
-  @Patch()
+  @Patch(':reminder_id')
   updateReminder(
     @Req() req: CustomRequest,
     @Param('team_id', ParseUUIDPipe) team_id: string,
     @Param('task_id', ParseUUIDPipe) task_id: string,
+    @Param('reminder_id', ParseUUIDPipe) reminder_id: string,
 
     @Body() reminderDto: UpdateReminderDto,
   ) {
-    const reminderInput = new Reminder(reminderDto);
+    const reminderInput = new Reminder({ ...reminderDto, id: reminder_id });
     const requestUser = new User(req.user);
     return this.reminderUserCases.updateReminder(
       reminderInput,

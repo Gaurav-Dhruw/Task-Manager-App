@@ -16,14 +16,19 @@ export class ReminderScheduler {
   async scheduleReminder(): Promise<void> {
     console.log(new Date().getSeconds());
     const reminders = await this.reminderUseCases.getReminders();
+
     const notifications =
       this.notificationService.remindersToNotifications(reminders);
+
     const emailOptions =
       this.notificationService.notificationsToEmailOptions(notifications);
 
-    if (emailOptions.length)
-      this.notificationService.email.sendMails(emailOptions);
-    if (reminders.length)
-      await this.reminderUseCases.deleteReminders(reminders);
+    if (reminders.length) {
+      await Promise.all([
+        this.notificationUseCases.createNotifications(notifications),
+        this.notificationService.email.sendMails(emailOptions),
+        this.reminderUseCases.deleteReminders(reminders),
+      ]);
+    }
   }
 }

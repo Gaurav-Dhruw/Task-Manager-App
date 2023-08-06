@@ -20,13 +20,10 @@ export class NotificationRepository implements INotificationRepository {
 
   getAll(options?: {
     user_id?: string;
-    skip?:number;
-    take?:number;
+    skip?: number;
+    take?: number;
   }): Promise<Notification[]> {
-    const {
-      user_id,
-
-    } = options || {};
+    const { user_id } = options || {};
     return this.notificationRepository.find({
       where: {
         receiver: { id: user_id },
@@ -34,6 +31,7 @@ export class NotificationRepository implements INotificationRepository {
       relations: ['receiver'],
       select: {
         id: true,
+        title: true,
         content: true,
         receiver: {
           id: true,

@@ -1,14 +1,14 @@
 export interface NotificationTemplate {
-  title: string;
   template: string;
   context: object;
 }
 
-export interface EmailTemplate extends NotificationTemplate {
+export interface EmailTemplate extends Omit<NotificationTemplate, 'title' | 'template'>  {
   subject: string;
   to: string;
 
   context: {
+    title:string;
     content: string;
   };
 }

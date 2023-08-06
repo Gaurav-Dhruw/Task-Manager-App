@@ -65,10 +65,9 @@ export class UserController {
     return this.notificationService.email.sendMails([
       {
         to: 'raxstargd@gmail.com',
-        title: 'Task Reminder',
         subject: 'Task Reminder',
-        template: 'email-template',
         context: {
+          title: 'Task Reminder',
           content: templateString,
         },
       },
