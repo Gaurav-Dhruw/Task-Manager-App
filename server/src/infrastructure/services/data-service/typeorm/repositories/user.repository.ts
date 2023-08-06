@@ -18,11 +18,13 @@ export class UserRepository implements IUserRepository {
         email: true,
         name: true,
         password: true,
+        is_verified: true,
         profile_pic: true,
       },
       relations: ['tasks', 'teams'],
     });
   }
+
   getById(id: string): Promise<User> {
     return this.userRepository.findOne({
       where: {
@@ -36,6 +38,7 @@ export class UserRepository implements IUserRepository {
       where: { id: In(ids) },
     });
   }
+
   getAll(): Promise<User[]> {
     return this.userRepository.find({ relations: ['tasks', 'teams'] });
   }
@@ -43,6 +46,7 @@ export class UserRepository implements IUserRepository {
   create(user: User): Promise<User> {
     return this.userRepository.save(user, { reload: true });
   }
+  
   update(id: string, user: User): Promise<User> {
     return this.userRepository.save(user);
   }

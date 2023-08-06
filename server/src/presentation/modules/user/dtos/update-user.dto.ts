@@ -1,6 +1,6 @@
 import { OmitType, PartialType } from '@nestjs/mapped-types';
 import { IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
-import { RegisterUserDto } from './register-user.dto';
+import { RegisterUserDto } from '../../auth/dtos/register-user.dto';
 import { User } from 'src/domain/entities';
 
 export class UpdateUserDto {

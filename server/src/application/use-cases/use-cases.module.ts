@@ -5,10 +5,12 @@ import { TaskUseCasesModule } from './task/task-use-cases.module';
 import { CommentUseCasesModule } from './comment/comment-use-cases.module';
 import { ReminderUseCasesModule } from './reminder/reminder-use-cases.module';
 import { NotificationUseCasesModule } from './notification/notification-use-cases.module';
+import { AuthUseCasesModule } from './auth/auth-use-cases.module';
 
 @Global()
 @Module({
   imports: [
+    AuthUseCasesModule,
     UserUseCasesModule,
     TeamUseCasesModule,
     TaskUseCasesModule,
@@ -17,6 +19,7 @@ import { NotificationUseCasesModule } from './notification/notification-use-case
     NotificationUseCasesModule,
   ],
   exports: [
+    AuthUseCasesModule,
     UserUseCasesModule,
     TeamUseCasesModule,
     TaskUseCasesModule,

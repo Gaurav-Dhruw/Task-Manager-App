@@ -23,7 +23,7 @@ export class RegisterUserDto {
   password: string;
 }
 
-export class RegisterUserResponseDto extends OmitType(User,['password']){
+export class VerifyUserResponseDto extends OmitType(User,['password']){
 
 
   token: string;

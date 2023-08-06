@@ -13,7 +13,7 @@ export class EmailNotificationService implements IEmailNotificationService {
         const {
           to,
           subject,
-          context: { content , title},
+          context: { content },
         } = option || {};
 
         return this.mailerService.sendMail({
@@ -21,7 +21,6 @@ export class EmailNotificationService implements IEmailNotificationService {
           subject,
           template: 'email-template',
           context: {
-            title,
             content,
           },
         });

@@ -76,7 +76,6 @@ export class NotificationService implements INotificationService {
         to: notification.receiver?.email,
         subject: notification.title,
         context: {
-          title: notification.title,
           content: notification.content,
         },
       };

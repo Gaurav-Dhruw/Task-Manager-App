@@ -3,12 +3,11 @@ export interface NotificationTemplate {
   context: object;
 }
 
-export interface EmailTemplate extends Omit<NotificationTemplate, 'title' | 'template'>  {
+export interface EmailTemplate extends Omit<NotificationTemplate, 'template'>  {
   subject: string;
   to: string;
 
   context: {
-    title:string;
     content: string;
   };
 }

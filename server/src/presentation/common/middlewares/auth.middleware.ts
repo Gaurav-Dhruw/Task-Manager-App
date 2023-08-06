@@ -1,4 +1,5 @@
 import {
+  ForbiddenException,
   Injectable,
   NestMiddleware,
   UnauthorizedException,
@@ -23,7 +24,9 @@ export class AuthMiddleware implements NestMiddleware {
         throw new UnauthorizedException('Invalid Token');
 
       console.log('Auth Hit');
+
       const user = await this.dataService.user.getById(requestUser.id);
+
       if (!user) throw new UnauthorizedException('User Unauthorized');
 
       req.user = requestUser;
