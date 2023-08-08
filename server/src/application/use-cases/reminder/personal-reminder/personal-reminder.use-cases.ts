@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { IDataService } from 'src/domain/abstracts';
+import { IDataService, IReminderScheduler } from 'src/domain/abstracts';
 import { Reminder, User } from 'src/domain/entities';
 import { PersonalReminderHelper } from './helpers/personal-reminder.helper';
 
@@ -8,6 +8,7 @@ export class PersonalReminderUseCases {
   constructor(
     private readonly dataService: IDataService,
     private readonly helper: PersonalReminderHelper,
+    private readonly reminderScheduler: IReminderScheduler,
   ) {}
 
   //Done
@@ -31,7 +32,12 @@ export class PersonalReminderUseCases {
     this.helper.validateReminderSchedule(schedule);
 
     inputReminder.receivers = task.assigned_to;
-    return this.dataService.reminder.create(inputReminder);
+
+    const reminder = await this.dataService.reminder.create(inputReminder);
+
+    this.reminderScheduler.scheduleReminder({ ...reminder, task });
+
+    return reminder;
   }
 
   //Done
@@ -60,7 +66,12 @@ export class PersonalReminderUseCases {
     this.helper.validateReminderSchedule(reschedule);
 
     reminder.scheduled_for = reschedule;
-    return this.dataService.reminder.update(reminder_id, reminder);
+    const updatedReminder = await this.dataService.reminder.update(
+      reminder_id,
+      reminder,
+    );
+    this.reminderScheduler.updateSchedule(updatedReminder);
+    return updatedReminder;
   }
 
   //Done
@@ -82,5 +93,6 @@ export class PersonalReminderUseCases {
     this.helper.isTaskCreator(task, requestUser);
 
     await this.dataService.reminder.delete(id);
+    this.reminderScheduler.deleteScheduledReminder(id);
   }
 }

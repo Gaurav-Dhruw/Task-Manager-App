@@ -27,7 +27,7 @@ export class EmailNotificationService implements IEmailNotificationService {
       }),
     )
       .then((res) => {
-        console.log('Emails Sent');
+        // console.log('Emails Sent');
       })
       .catch((err) => {
         console.log(err);

@@ -1,7 +1,5 @@
 import {
-  BadRequestException,
   Injectable,
-  NotFoundException,
 } from '@nestjs/common';
 import { IDataService } from 'src/domain/abstracts';
 import { Comment, User } from 'src/domain/entities';

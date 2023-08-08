@@ -16,12 +16,18 @@ export class TeamRepository implements ITeamRepository {
       relations: ['admins', 'members', 'tasks'],
     });
   }
-  getAll(): Promise<Team[]> {
-    return this.teamRepository.find({ relations: ['admins', 'members'] });
-  }
 
-  getAllWhereUser(user_id: string): Promise<Team[]> {
-    return this.teamRepository.find({ where: { members: { id: user_id } } });
+
+  getAll(options?:{user_id?: string}): Promise<Team[]> {
+    const {user_id} = options || {};
+
+    return this.teamRepository.find({ 
+      where: {
+         members: { 
+          id: user_id 
+        } 
+      } 
+    });
   }
 
   create(team: Team): Promise<Team> {

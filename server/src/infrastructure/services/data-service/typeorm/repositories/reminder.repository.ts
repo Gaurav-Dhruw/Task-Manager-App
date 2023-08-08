@@ -18,14 +18,14 @@ export class ReminderRepository implements IReminderRepository {
     });
   }
 
-  getAll(options?:{task_id?:string, between ?:{start:Date, end:Date}}): Promise<Reminder[]> {
+  getAll(options?:{task_id?:string, user_id?:string}): Promise<Reminder[]> {
 
-    const {task_id, between:{start, end}} = options || {};
+    const {task_id, user_id} = options || {};
 
     return this.reminderRepository.find({ 
       where:{
         task:{id:task_id},
-        scheduled_for: Between(start,end),
+        receivers:{id:user_id},
       },
       relations: ['receivers', 'task'] 
     });

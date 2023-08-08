@@ -28,6 +28,7 @@ export class PersonalReminderController {
     const requestUser = new User(req.user);
     return this.reminderUserCases.createReminder(reminder, requestUser);
   }
+  
   @Patch(':reminder_id')
   updateReminder(
     @Req() req: CustomRequest,

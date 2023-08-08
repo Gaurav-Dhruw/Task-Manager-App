@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { IDataService } from 'src/domain/abstracts';
-import { Reminder, User, Comment } from 'src/domain/entities';
+import { IDataService, IReminderScheduler } from 'src/domain/abstracts';
+import { Reminder, User } from 'src/domain/entities';
 import { TeamReminderHelper } from './helpers/team-reminder.helper';
 
 @Injectable()
@@ -8,6 +8,7 @@ export class TeamReminderUseCases {
   constructor(
     private readonly dataService: IDataService,
     private readonly helper: TeamReminderHelper,
+    private readonly reminderScheduler: IReminderScheduler,
   ) {}
   //Done
   async createReminder(
@@ -34,7 +35,11 @@ export class TeamReminderUseCases {
     this.helper.validateReminderSchedule(schedule);
 
     inputReminder.receivers = task.assigned_to;
-    return this.dataService.reminder.create(inputReminder);
+    const reminder = await this.dataService.reminder.create(inputReminder);
+    
+    this.reminderScheduler.scheduleReminder(reminder);
+    
+    return reminder;
   }
 
   //Done
@@ -60,9 +65,11 @@ export class TeamReminderUseCases {
     // Checks if user is either the task creator or task assgined user.
     this.helper.checkAuthorization(team, task, requestUser);
 
-    // If it a reminder of individual task.
 
-    return this.dataService.reminder.update(reminder.id, reminder);
+    const updatedReminder = await this.dataService.reminder.update(reminder.id, reminder);
+    this.reminderScheduler.updateSchedule(updatedReminder);
+
+    return updatedReminder;
   }
 
   //Done
@@ -86,5 +93,6 @@ export class TeamReminderUseCases {
     this.helper.checkAuthorization(team, task, requestUser);
 
     await this.dataService.reminder.delete(reminder_id);
+    this.reminderScheduler.deleteScheduledReminder(reminder_id);
   }
 }

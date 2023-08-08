@@ -7,23 +7,19 @@ import {
   UpdateUserResponseDto,
 } from './dtos';
 import { UserUseCases } from 'src/application/use-cases/user/user.use-cases';
-import { INotificationService, ITokenService } from 'src/domain/abstracts';
 import { CustomRequest } from 'src/presentation/common/types';
 import { UpdateDtoValidationPipe } from 'src/presentation/common/pipes';
-import { ReminderTemplate } from 'src/domain/types';
 
 @Controller('user')
 export class UserController {
   constructor(
     private readonly userUseCases: UserUseCases,
-    private readonly tokenService: ITokenService,
-    private readonly notificationService: INotificationService,
   ) {}
 
-  @Get('get-all')
-  findAllUsers() {
-    return this.userUseCases.getAllUsers();
-  }
+  // @Get('get-all')
+  // findAllUsers() {
+  //   return this.userUseCases.getAllUsers();
+  // }
 
   @UsePipes(new UpdateDtoValidationPipe(['name']))
   @Patch()

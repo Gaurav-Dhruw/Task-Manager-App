@@ -6,7 +6,6 @@ import { Notification, Reminder, User } from 'src/domain/entities';
 export class ReminderUseCases {
   constructor(
     private readonly dataService: IDataService,
-    private readonly notificationService: INotificationService,
   ) {}
 
   async deleteReminders(reminders: Reminder[]): Promise<void> {
@@ -14,21 +13,11 @@ export class ReminderUseCases {
     await this.dataService.reminder.deleteMany(ids);
   }
 
-  getReminders() {
-    const start = new Date();
-    const end = new Date(start.getTime() + 6 * 60 * 60 * 1000);
-    return this.dataService.reminder.getAll({ between: { start, end } });
-  }
-
-  // remindersToNotifications(reminders: Reminder[]) {
-  //   const notifications: Notification[] = [];
-
-  //   reminders.forEach((reminder) => {
-  //     reminder.receivers.forEach((receiver) => {
-  //       notifications.push(notification);
-  //     });
-  //   });
-
-  //   return notifications;
+  // getReminders() {
+  //   const start = new Date();
+  //   const end = new Date(start.getTime() + 6 * 60 * 60 * 1000);
+  //   return this.dataService.reminder.getAll({ between: { start, end } });
   // }
+
+
 }

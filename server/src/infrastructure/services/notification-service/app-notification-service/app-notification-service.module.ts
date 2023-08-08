@@ -3,7 +3,6 @@ import { IAppNotificationService } from 'src/domain/abstracts';
 import { AppNotificationService } from './app-notification.service';
 
 @Module({
-  imports: [],
   providers: [{
     provide:IAppNotificationService,
     useClass:AppNotificationService
