@@ -1,9 +1,7 @@
-import { Reminder, Team } from './';
+import { Reminder, Task, Team } from './';
 import {
   Column,
   Entity,
-  JoinColumn,
-  JoinTable,
   ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
@@ -22,21 +20,24 @@ export class User {
   @Column()
   name: string;
 
-  @Column()
+  @Column({ select: false })
   password: string;
 
   @Column({
     nullable: true,
   })
-  profile_pic: string;
+  profile_pic?: string;
+
+  @Column({
+    default:false,
+  })
+  is_verified: boolean;
 
   @ManyToMany(() => Team, (team) => team.members, {
     nullable: true,
   })
   teams?: Team[];
 
-  @ManyToOne(() => Reminder, (reminder) => reminder.receivers, {
-    nullable: true,
-  })
-  reminders?: Reminder[];
+  @ManyToMany(() => Task, (task) => task.assigned_to, { nullable: true })
+  tasks?: Task[];
 }

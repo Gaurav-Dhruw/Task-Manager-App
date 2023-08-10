@@ -6,19 +6,63 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class NotificationRepository implements INotificationRepository {
-  constructor(@InjectRepository(Notification) NotificationRepository: Repository<Notification>) {}
+  constructor(
+    @InjectRepository(Notification)
+    private readonly notificationRepository: Repository<Notification>,
+  ) {}
 
   getById(id: string): Promise<Notification> {
-    return;
+    return this.notificationRepository.findOne({
+      where: { id },
+      relations: ['receiver'],
+    });
   }
-  getAll(): Promise<Notification[]> {
-    return;
+
+  getAll(options?: {
+    user_id?: string;
+    skip?: number;
+    take?: number;
+  }): Promise<Notification[]> {
+    const { user_id } = options || {};
+    return this.notificationRepository.find({
+      where: {
+        receiver: { id: user_id },
+      },
+      relations: ['receiver'],
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        receiver: {
+          id: true,
+          name: true,
+          email: true,
+        },
+        created_at: true,
+      },
+      order: { created_at: 'DESC' },
+      // take: take || 10,
+      // skip: (skip - 1) * take,
+    });
   }
-  create(item: Notification): Promise<Notification> {
-    return;
+
+  create(notification: Notification): Promise<Notification> {
+    return this.notificationRepository.save(notification);
   }
-  update(id: string, item: Notification): Promise<Notification> {
-    return;
+
+  createMany(notifications: Notification[]): Promise<Notification[]> {
+    return this.notificationRepository.save(notifications);
   }
-  delete(id: string): void {}
+
+  update(id: string, notification: Notification): Promise<Notification> {
+    return this.notificationRepository.save(notification);
+  }
+
+  updateMany(notifications: Notification[]): Promise<Notification[]> {
+    return this.notificationRepository.save(notifications);
+  }
+
+  async delete(id: string): Promise<void> {
+    await this.notificationRepository.delete(id);
+  }
 }

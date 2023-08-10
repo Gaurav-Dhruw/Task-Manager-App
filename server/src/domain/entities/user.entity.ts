@@ -1,5 +1,4 @@
-import { Team } from './';
-
+import { Task, Team } from './';
 
 export class User {
   id: string;
@@ -7,9 +6,11 @@ export class User {
   name: string;
   password: string;
   profile_pic?: string;
+  is_verified: boolean;
   teams?: Team[];
+  tasks?: Task[];
 
-  constructor(data?: Partial<User>) {
-    Object.assign(this,data);
+  constructor(options?: Partial<User>) {
+    Object.assign(this, options);
   }
 }

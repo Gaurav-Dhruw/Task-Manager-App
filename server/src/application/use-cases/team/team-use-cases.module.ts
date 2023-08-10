@@ -1,10 +1,9 @@
-import { Module } from "@nestjs/common";
-import { TeamUseCases } from "./team.use-cases";
-
+import { Module } from '@nestjs/common';
+import { TeamUseCases } from './team.use-cases';
+import { TeamUseCasesHelper } from './helpers/team-use-cases.helper';
 
 @Module({
-    imports:[],
-    providers:[TeamUseCases],
-    exports:[TeamUseCases],
+  providers: [TeamUseCases, TeamUseCasesHelper],
+  exports: [TeamUseCases],
 })
-export class TeamUseCasesModule{}
+export class TeamUseCasesModule {}

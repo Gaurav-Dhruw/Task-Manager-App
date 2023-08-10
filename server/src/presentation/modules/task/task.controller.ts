@@ -1,4 +1,11 @@
-import { Controller } from '@nestjs/common';
+// import { Controller, Get, Req } from '@nestjs/common';
+// import { TaskUseCases } from 'src/application/use-cases/task/task.use-cases';
+// import { CustomRequest } from 'src/presentation/common/types';
 
-@Controller()
-export class TaskController {}
+// import { Task } from 'src/domain/entities';
+
+// @Controller('task')
+// export class TaskController {
+//   constructor(private readonly taskUseCases: TaskUseCases) {}
+
+// }

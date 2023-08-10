@@ -8,10 +8,10 @@ import {
 } from '../';
 
 export abstract class IDataService {
-  user: IUserRepository;
-  team: ITeamRepository;
-  task: ITaskRepository;
-  comment: ICommentRepository;
-  reminder: IReminderRepository;
-  notification: INotificationRepository;
+  abstract user: IUserRepository;
+  abstract team: ITeamRepository;
+  abstract task: ITaskRepository;
+  abstract comment: ICommentRepository;
+  abstract reminder: IReminderRepository;
+  abstract notification: INotificationRepository;
 }

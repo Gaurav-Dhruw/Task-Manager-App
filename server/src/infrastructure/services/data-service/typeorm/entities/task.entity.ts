@@ -1,5 +1,5 @@
 import { Priority, Status } from 'src/domain/types';
-import { Reminder, Team, User } from './';
+import { Reminder, Team, User, Comment } from './';
 import {
   Column,
   Entity,
@@ -7,10 +7,10 @@ import {
   JoinTable,
   ManyToMany,
   ManyToOne,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-
 
 @Entity()
 export class Task {
@@ -21,32 +21,40 @@ export class Task {
   title: string;
 
   @Column({
-    nullable:true
+    nullable: true,
   })
   description?: string;
+
+  @Column({ nullable: true })
+  deadline?: Date;
 
   @Column({ type: 'enum', enum: Status, default: Status.Unfinished })
   status: Status;
 
-  @Column({ type: 'enum', enum: Priority, nullable:true})
+  @Column({ type: 'enum', enum: Priority, nullable: true })
   priority?: Priority;
 
-  @OneToOne(() => User)
-  @JoinColumn()
+  @ManyToOne(() => User, {
+    onDelete: 'SET NULL',
+  })
   created_by: User;
 
-  @ManyToMany(() => User)
+  @ManyToMany(() => User, (user) => user.tasks, )
   @JoinTable()
   assigned_to: User[];
 
   @ManyToOne(() => Team, (team) => team.tasks, {
-    nullable:true
+    nullable: true,
   })
   team?: Team;
 
-  @OneToOne(() => Reminder, (reminder) => reminder.task,{
-    nullable:true
+  @OneToMany(() => Comment, (comment) => comment.task, {
+    nullable: true,
   })
-  @JoinColumn()
-  reminder?: Reminder;
+  comments?: Comment[];
+
+  @OneToMany(() => Reminder, (reminder) => reminder.task, {
+    nullable: true,
+  })
+  reminders?: Reminder[];
 }

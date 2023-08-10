@@ -1,8 +1,9 @@
 import {
   Column,
   Entity,
-  OneToMany,
-  OneToOne,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Task, User } from './';
@@ -12,10 +13,11 @@ export class Reminder {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @OneToMany(() => User, (user) => user.reminders)
+  @ManyToMany(() => User)
+  @JoinTable()
   receivers: User[];
 
-  @OneToOne(() => Task, (task) => task.reminder)
+  @ManyToOne(() => Task, (task) => task.reminders, { onDelete: 'CASCADE' })
   task: Task;
 
   @Column()

@@ -1,65 +1,35 @@
-import {
-  BadRequestException,
-  Body,
-  Controller,
-  Inject,
-  NotFoundException,
-  Patch,
-  Post,
-  Req,
-} from '@nestjs/common';
+import { Body, Controller, Get, Patch, Req, UsePipes } from '@nestjs/common';
 
 import { User } from 'src/domain/entities';
 import {
-  LoginUserDto,
-  LoginUserResponseDto,
-  RegisterUserDto,
-  RegisterUserResponseDto,
+  UpdateUserDto,
+  UpdateUserCredentialsDto,
+  UpdateUserResponseDto,
 } from './dtos';
 import { UserUseCases } from 'src/application/use-cases/user/user.use-cases';
-import {
-  UpdateUserCredentialsDto,
-  UpdateUserDto,
-} from './dtos/update-user.dto';
-import { ITokenService } from 'src/domain/abstracts';
 import { CustomRequest } from 'src/presentation/common/types';
+import { UpdateDtoValidationPipe } from 'src/presentation/common/pipes';
 
 @Controller('user')
 export class UserController {
   constructor(
-    private readonly userUserCases: UserUseCases,
-    private readonly tokenService: ITokenService,
+    private readonly userUseCases: UserUseCases,
   ) {}
 
-  @Post('login')
-  async loginUser(
-    @Body() userDto: LoginUserDto,
-  ): Promise<LoginUserResponseDto> {
-    const user = new User(userDto);
-    const userDetails = await this.userUserCases.loginUser(user);
-    const token = this.tokenService.generateToken(userDetails);
-    console.log(userDetails);
-    return new LoginUserResponseDto({ ...userDetails, token });
-  }
+  // @Get('get-all')
+  // findAllUsers() {
+  //   return this.userUseCases.getAllUsers();
+  // }
 
-  @Post('sign-up')
-  async registerUser(
-    @Body() userDto: RegisterUserDto,
-  ): Promise<RegisterUserResponseDto> {
-    const user = new User(userDto);
-    const registeredUser = await this.userUserCases.registerUser(user);
-    const token = this.tokenService.generateToken(registeredUser);
-
-    return new RegisterUserResponseDto({ ...registeredUser, token });
-  }
-
-  @Patch('update')
+  @UsePipes(new UpdateDtoValidationPipe(['name']))
+  @Patch()
   async updateUser(@Req() req: CustomRequest, @Body() userDto: UpdateUserDto) {
-    if (this.isEmptyObject(userDto) || this.hasNullValues(userDto))
-      throw new BadRequestException();
+    const inputUser = new User(userDto);
+    inputUser.id = req.user.id;
 
-    const user = new User({ ...req.user, ...userDto });
-    return this.userUserCases.updateUser(user);
+    const user = await this.userUseCases.updateUser(inputUser);
+
+    return new UpdateUserResponseDto(user);
   }
 
   @Patch('update/credentials')
@@ -67,16 +37,5 @@ export class UserController {
     @Body() user: UpdateUserCredentialsDto,
   ): Promise<void> {
     return;
-  }
-
-  isEmptyObject(obj: object): boolean {
-    return Object.keys(obj).length === 0;
-  }
-
-  hasNullValues(obj: object): boolean {
-    for (const key in obj) {
-      if (obj[key] === null) return true;
-    }
-    return false;
   }
 }

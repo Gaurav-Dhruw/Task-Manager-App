@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthMiddleware } from './presentation/common/middlewares/auth.middleware';
 import { ControllersModule } from './presentation/modules/controllers.module';
 import { UseCasesModule } from './application/use-cases/use-cases.module';
+import { SchedulerModule } from './infrastructure/jobs/scheduler.module';
 
 @Module({
   imports: [
@@ -11,14 +12,12 @@ import { UseCasesModule } from './application/use-cases/use-cases.module';
     ServicesModule,
     UseCasesModule,
     ControllersModule,
+    SchedulerModule,
   ],
   providers: [],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(AuthMiddleware)
-      .exclude('user/login', 'user/sign-up')
-      .forRoutes('user', 'team', 'task', 'comment', 'reminder', 'notification');
+    consumer.apply(AuthMiddleware).exclude('auth').forRoutes('user', 'team');
   }
 }
