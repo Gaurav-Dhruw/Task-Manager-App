@@ -1,11 +1,8 @@
 import { OmitType, PartialType } from '@nestjs/mapped-types';
-import { IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
-import { RegisterUserDto } from '../../auth/dtos/register-user.dto';
+import { IsEmail, IsNotEmpty, IsOptional, IsString, IsStrongPassword } from 'class-validator';
 import { User } from 'src/domain/entities';
 
 export class UpdateUserDto {
-
-
   @IsOptional()
   @IsString()
   @IsNotEmpty()
@@ -17,7 +14,11 @@ export class UpdateUserDto {
   profile_pic?: string;
 }
 
-export class UpdateUserResponseDto extends OmitType(User, ['password','teams','tasks']) {
+export class UpdateUserResponseDto extends OmitType(User, [
+  'password',
+  'teams',
+  'tasks',
+]) {
   constructor(options?: Partial<User>) {
     super(options);
 
@@ -28,6 +29,4 @@ export class UpdateUserResponseDto extends OmitType(User, ['password','teams','t
   }
 }
 
-export class UpdateUserCredentialsDto extends PartialType(
-  OmitType(RegisterUserDto, ['name']),
-) {}
+

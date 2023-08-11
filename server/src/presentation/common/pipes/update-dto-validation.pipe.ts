@@ -8,17 +8,21 @@ export class UpdateDtoValidationPipe implements PipeTransform {
     this.options = options;
   }
   transform(dto: any) {
-    // console.log(dto);
-    if (Object.keys(dto).length < 1)
-      throw new BadRequestException('No valid fields to update');
-    else if (this.options) {
-      const errorMsgs: string[] = [];
-      this.options.forEach((key) => {
-        if (dto[key] === null) errorMsgs.push(`${key} can't be null`);
-      });
+    console.log(dto);
+    const errorMsgs: string[] = [];
+    let nonEmptyFields: number = this.options.length;
 
-      if (errorMsgs.length > 0) throw new BadRequestException(errorMsgs);
-    }
+    this.options.forEach((key) => {
+      if (!(key in dto)) nonEmptyFields--;
+      else if (!dto[key]) {
+        errorMsgs.push(`${key} can't be empty`);
+      }
+    });
+    console.log(nonEmptyFields);
+    if (!Object.keys(dto).length || !nonEmptyFields)
+      throw new BadRequestException('no valid fields present to update');
+    else if (errorMsgs.length > 0) throw new BadRequestException(errorMsgs);
+
     return dto;
   }
 }

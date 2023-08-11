@@ -8,12 +8,13 @@ import {
   Req,
 } from '@nestjs/common';
 import {
+  GenerateVerificationLinkDto,
   LoginUserDto,
   LoginUserResponseDto,
   RegisterUserDto,
   VerifyUserResponseDto,
 } from './dtos';
-import { User } from 'src/domain/entities';
+import { Otp, User } from 'src/domain/entities';
 import { CustomRequest } from 'src/presentation/common/types';
 import { ITokenService } from 'src/domain/abstracts';
 import { AuthUseCases } from 'src/application/use-cases/auth/auth.use-cases';
@@ -64,11 +65,15 @@ export class AuthController {
   @Post('verification-link')
   async generateVerificationLink(
     @Req() req: CustomRequest,
-    @Body() userDto: LoginUserDto,
+    @Body() dto: GenerateVerificationLinkDto,
   ): Promise<void> {
-    const inputUser = new User(userDto);
+    const otp = new Otp({
+      email: dto.email,
+      code: dto.otp,
+    });
+
     const baseUrl = req.protocol + '://' + req.get('host');
 
-    await this.authUseCases.generateVerificationLink({ inputUser, baseUrl });
+    await this.authUseCases.generateVerificationLink({ otp, baseUrl });
   }
 }

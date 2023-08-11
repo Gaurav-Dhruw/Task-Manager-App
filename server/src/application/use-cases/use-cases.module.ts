@@ -6,10 +6,12 @@ import { CommentUseCasesModule } from './comment/comment-use-cases.module';
 import { ReminderUseCasesModule } from './reminder/reminder-use-cases.module';
 import { NotificationUseCasesModule } from './notification/notification-use-cases.module';
 import { AuthUseCasesModule } from './auth/auth-use-cases.module';
+import { OtpUseCasesModule } from './otp/otp-use-cases.module';
 
 @Global()
 @Module({
   imports: [
+    OtpUseCasesModule,
     AuthUseCasesModule,
     UserUseCasesModule,
     TeamUseCasesModule,
@@ -19,6 +21,7 @@ import { AuthUseCasesModule } from './auth/auth-use-cases.module';
     NotificationUseCasesModule,
   ],
   exports: [
+    OtpUseCasesModule,
     AuthUseCasesModule,
     UserUseCasesModule,
     TeamUseCasesModule,

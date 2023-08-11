@@ -1,28 +1,22 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
 import { IEmailNotificationService } from 'src/domain/abstracts';
-import { EmailTemplate } from 'src/domain/types';
+import { IGenericEmailTemplate } from 'src/domain/types';
 
 @Injectable()
 export class EmailNotificationService implements IEmailNotificationService {
   constructor(private readonly mailerService: MailerService) {}
 
-  async sendMails(emailOptions: EmailTemplate[]): Promise<void> {
+  async sendMails(emailOptions: IGenericEmailTemplate[]): Promise<void> {
     Promise.all(
       emailOptions.map((option) => {
-        const {
-          to,
-          subject,
-          context: { content },
-        } = option || {};
+        const { to, subject, context, template } = option;
 
         return this.mailerService.sendMail({
           to,
           subject,
-          template: 'email-template',
-          context: {
-            content,
-          },
+          template,
+          context,
         });
       }),
     )

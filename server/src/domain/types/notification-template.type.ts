@@ -1,34 +1,43 @@
-export interface NotificationTemplate {
+export interface INotificationTemplate {
   template: string;
   context: object;
 }
 
-export interface EmailTemplate extends Omit<NotificationTemplate, 'template'>  {
+export interface IWelcomeTemplate extends INotificationTemplate {
+  context: {
+    username: string;
+  };
+}
+
+export interface IReminderTemplate extends INotificationTemplate {
+  context: {
+    username: string;
+    task_name: string;
+    reminder_schedule: Date;
+  };
+}
+
+export interface IGenericEmailTemplate extends INotificationTemplate {
   subject: string;
   to: string;
+}
 
+export interface IEmailTemplate extends IGenericEmailTemplate {
   context: {
     content: string;
   };
 }
 
-export interface WelcomeTemplate extends NotificationTemplate {
+export interface IOtpTemplate extends IGenericEmailTemplate {
   context: {
     username: string;
+    code: string;
   };
 }
 
-export interface ConfirmationTemplate extends NotificationTemplate {
+export interface IVerificationTemplate extends IGenericEmailTemplate {
   context: {
     username: string;
     verification_url: string;
-  };
-}
-
-export interface ReminderTemplate extends NotificationTemplate {
-  context: {
-    username: string;
-    task_name: string;
-    reminder_schedule: Date;
   };
 }

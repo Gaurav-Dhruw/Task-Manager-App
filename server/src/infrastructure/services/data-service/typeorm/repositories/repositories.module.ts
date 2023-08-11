@@ -1,6 +1,14 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Comment, Notification, Reminder, Task, Team, User } from '../entities';
+import {
+  Comment,
+  Notification,
+  Otp,
+  Reminder,
+  Task,
+  Team,
+  User,
+} from '../entities';
 import {
   UserRepository,
   NotificationRepository,
@@ -9,6 +17,7 @@ import {
   ReminderRepository,
   TaskRepository,
 } from './';
+import { OtpRepository } from './otp.repository';
 
 @Module({
   imports: [
@@ -19,6 +28,7 @@ import {
       Reminder,
       Notification,
       Comment,
+      Otp,
     ]),
   ],
   providers: [
@@ -28,6 +38,7 @@ import {
     CommentRepository,
     ReminderRepository,
     NotificationRepository,
+    OtpRepository,
   ],
   exports: [
     UserRepository,
@@ -36,6 +47,7 @@ import {
     CommentRepository,
     ReminderRepository,
     NotificationRepository,
+    OtpRepository,
   ],
 })
 export class RepositoriesModule {}
