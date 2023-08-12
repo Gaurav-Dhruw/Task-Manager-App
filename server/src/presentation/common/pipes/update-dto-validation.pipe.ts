@@ -2,24 +2,24 @@ import { BadRequestException, PipeTransform, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class UpdateDtoValidationPipe implements PipeTransform {
-  options: string[];
+  nonEmptyFields: string[];
+  minSize: number;
 
-  constructor(options?: string[]) {
-    this.options = options;
+  constructor(options?: { nonEmptyFields?: string[]; minSize?: number }) {
+    this.nonEmptyFields = options?.nonEmptyFields ?? [];
+    this.minSize = options?.minSize ?? 1;
   }
   transform(dto: any) {
     console.log(dto);
     const errorMsgs: string[] = [];
-    let nonEmptyFields: number = this.options.length;
 
-    this.options.forEach((key) => {
-      if (!(key in dto)) nonEmptyFields--;
-      else if (!dto[key]) {
+    this.nonEmptyFields.forEach((key) => {
+      if (key in dto && !dto[key]) {
         errorMsgs.push(`${key} can't be empty`);
       }
     });
-    console.log(nonEmptyFields);
-    if (!Object.keys(dto).length || !nonEmptyFields)
+
+    if (Object.keys(dto).length < this.minSize)
       throw new BadRequestException('no valid fields present to update');
     else if (errorMsgs.length > 0) throw new BadRequestException(errorMsgs);
 

@@ -20,7 +20,7 @@ export class UserController {
   //   return this.userUseCases.getAllUsers();
   // }
 
-  @UsePipes(new UpdateDtoValidationPipe(['name']))
+  @UsePipes(new UpdateDtoValidationPipe({ nonEmptyFields: ['name'] }))
   @Patch('update/profile')
   async updateUser(@Req() req: CustomRequest, @Body() userDto: UpdateUserDto) {
     const inputUser = new User(userDto);
@@ -31,7 +31,12 @@ export class UserController {
     return new UpdateUserResponseDto(user);
   }
 
-  @UsePipes(new UpdateDtoValidationPipe(['new_email', 'password']))
+  @UsePipes(
+    new UpdateDtoValidationPipe({
+      nonEmptyFields: ['new_email', 'password'],
+      minSize: 3,
+    }),
+  )
   @Patch('update/credentials')
   async updateUserCredentials(
     @Body() dto: UpdateCredentialsDto,

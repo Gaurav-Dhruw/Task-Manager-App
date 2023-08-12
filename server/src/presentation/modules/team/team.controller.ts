@@ -57,7 +57,7 @@ export class TeamController {
     return this.teamUseCases.createTeam(team, requestUser);
   }
 
-  @UsePipes(new UpdateDtoValidationPipe(['team_name']))
+  @UsePipes(new UpdateDtoValidationPipe({ nonEmptyFields: ['team_name'] }))
   @Patch(':team_id')
   async updateTeam(
     @Req() req: CustomRequest,

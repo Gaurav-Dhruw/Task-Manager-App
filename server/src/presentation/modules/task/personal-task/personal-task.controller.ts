@@ -50,7 +50,7 @@ export class PersonalTaskController {
     return this.taskUseCases.createTask(taskInput, requestUser);
   }
 
-  @UsePipes(new UpdateDtoValidationPipe(['status', 'title']))
+  @UsePipes(new UpdateDtoValidationPipe({nonEmptyFields:['status', 'title']}))
   @Patch(':task_id')
   async updateTask(
     @Req() req: CustomRequest,

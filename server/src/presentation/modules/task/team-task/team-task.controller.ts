@@ -57,7 +57,7 @@ export class TeamTaskController {
     return this.taskUseCases.createTask(task, team_id, requestUser);
   }
 
-  @UsePipes(new UpdateDtoValidationPipe(['status', 'title']))
+  @UsePipes(new UpdateDtoValidationPipe({nonEmptyFields:['status', 'title']}))
   @Patch(':task_id')
   async updateTask(
     @Req() req: CustomRequest,
