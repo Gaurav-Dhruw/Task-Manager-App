@@ -44,7 +44,7 @@ export class OtpUseCases {
 
   async verifyAndInvalidateOtp(inputOtp: Otp): Promise<boolean> {
     const { email, code } = inputOtp;
-    const otp = await this.dataService.otp.get({ email, code });
+    const otp = await this.dataService.otp.get({ where: { email, code } });
 
     const is_verified: boolean =
       !!otp && new Date() < new Date(otp.expiration_time);

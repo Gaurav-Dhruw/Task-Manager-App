@@ -34,16 +34,18 @@ export class TeamReminderHelper {
     if (!reminder) errorMsgs.push('Reminder Not Found');
 
     if (errorMsgs.length > 0) throw new NotFoundException(errorMsgs);
-  }
 
-  validateMutateOperation(team: Team, task: Task, reminder: Reminder) {
-    const reminderBelongsToTheTask: boolean = reminder.task.id === task.id;
+    const reminderBelongsToTheTask: boolean = reminder.task?.id === task.id;
     const taskBelongsToTheTeam: boolean = task.team?.id === team.id;
 
     if (!reminderBelongsToTheTask || !taskBelongsToTheTeam) {
       throw new BadRequestException();
     }
   }
+
+  // validateMutateOperation(team: Team, task: Task, reminder: Reminder) {
+    
+  // }
 
   validateReminderSchedule(schedule: Date): void {
     if (new Date(schedule) <= new Date())
@@ -58,9 +60,11 @@ export class TeamReminderHelper {
     if (!task) errorMsgs.push('Task Not Found');
 
     if (errorMsgs.length > 0) throw new NotFoundException(errorMsgs);
+    else if (task.team?.id !== team.id) throw new BadRequestException();
   }
 
-  validateCreateOperation(team: Team, task: Task) {
-    if (task.team?.id !== team.id) throw new BadRequestException();
+  checkIfReceiversPresent(task: Task) {
+    if(!task.assigned_to?.length)
+      throw new BadRequestException('No Receivers Present')
   }
 }

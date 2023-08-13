@@ -25,7 +25,7 @@ import { PersonalTaskUseCases } from 'src/application/use-cases/task/personal-ta
 export class PersonalTaskController {
   constructor(private readonly taskUseCases: PersonalTaskUseCases) {}
   
-  @Get()
+  @Get('list')
   findAllTasks(@Req() req: CustomRequest): Promise<Task[]> {
     return this.taskUseCases.getAssignedTasks(req.user.id);
   }

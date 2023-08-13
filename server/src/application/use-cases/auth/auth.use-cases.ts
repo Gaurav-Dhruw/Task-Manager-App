@@ -74,6 +74,7 @@ export class AuthUseCases {
         verification_url,
       },
     };
+    
     this.notificationService.email.sendMails([emailOption]);
   }
 
@@ -102,7 +103,7 @@ export class AuthUseCases {
 
     const notification = new Notification({
       receiver: user,
-      title: 'Welcome to Task-Manager',
+      title: 'Welcome to Task Manager',
       content: templateString,
       created_at: new Date(),
     });

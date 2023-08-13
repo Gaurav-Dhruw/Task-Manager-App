@@ -18,27 +18,29 @@ export class TeamReminderUseCases {
   ): Promise<Reminder> {
     const task_id = inputReminder.task?.id;
     const schedule = inputReminder.scheduled_for;
+
     const [task, team] = await Promise.all([
       await this.dataService.task.getById(task_id),
       await this.dataService.team.getById(team_id),
     ]);
 
     // Checks if valid task and team is provided
+    // And team and task have connection.
     this.helper.validateCreateInput(team, task);
-    // Checks for team task and their enitities connection.
-    this.helper.validateCreateOperation(team, task);
 
-    // Checks if user is either the task creator or task assgined user.
+    // Checks if user is either the task creator or assgined to the task.
     this.helper.checkAuthorization(team, task, requestUser);
 
+    // Checks if receivers are present.
+    this.helper.checkIfReceiversPresent(task);
     // Validates schedule if its an upcomming date/time or not.
     this.helper.validateReminderSchedule(schedule);
 
     inputReminder.receivers = task.assigned_to;
     const reminder = await this.dataService.reminder.create(inputReminder);
-    
+
     this.reminderScheduler.scheduleReminder(reminder);
-    
+
     return reminder;
   }
 
@@ -49,7 +51,7 @@ export class TeamReminderUseCases {
     team_id: string,
     requestUser: User,
   ): Promise<Reminder> {
-    const { id: reminder_id } = inputReminder;
+    const { id: reminder_id, scheduled_for: schedule } = inputReminder;
 
     const [reminder, task, team] = await Promise.all([
       await this.dataService.reminder.getById(reminder_id),
@@ -57,16 +59,24 @@ export class TeamReminderUseCases {
       await this.dataService.team.getById(team_id),
     ]);
 
-    // Checks if the reminder exists.
+    // Checks if the reminder, task and team exists.
+    // And all of them have connection.
     this.helper.validateMutateInput(team, task, reminder);
-    // Checks for team task and each enitities connection.
-    this.helper.validateMutateOperation(team, task, reminder);
 
-    // Checks if user is either the task creator or task assgined user.
+    // Checks if user is either the task creator or assgined to the task.
     this.helper.checkAuthorization(team, task, requestUser);
 
+    // Checks if receivers are present.
+    this.helper.checkIfReceiversPresent(task);
+    // Validates schedule if its an upcomming date/time or not.
+    this.helper.validateReminderSchedule(schedule);
 
-    const updatedReminder = await this.dataService.reminder.update(reminder.id, reminder);
+    reminder.scheduled_for = schedule;
+    
+    const updatedReminder = await this.dataService.reminder.update(
+      reminder.id,
+      reminder,
+    );
     this.reminderScheduler.updateSchedule(updatedReminder);
 
     return updatedReminder;
@@ -84,12 +94,11 @@ export class TeamReminderUseCases {
       await this.dataService.task.getById(task_id),
       await this.dataService.team.getById(team_id),
     ]);
-    // Checks if the reminder exists.
+    // Checks if the reminder, task and team exists.
+    // And all of them have connection.
     this.helper.validateMutateInput(team, task, reminder);
-    // Checks for team task and each enitities connection.
-    this.helper.validateMutateOperation(team, task, reminder);
 
-    // Checks if user is either the task creator or task assgined user.
+    // Checks if user is either the task creator or assgined to the task.
     this.helper.checkAuthorization(team, task, requestUser);
 
     await this.dataService.reminder.delete(reminder_id);

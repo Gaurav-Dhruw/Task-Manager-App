@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable, PipeTransform,  } from '@nestjs/common';
+import {
+  ArgumentMetadata,
+  BadRequestException,
+  Injectable,
+  PipeTransform,
+} from '@nestjs/common';
 
 @Injectable()
 export class UpdateDtoValidationPipe implements PipeTransform {
@@ -9,8 +14,10 @@ export class UpdateDtoValidationPipe implements PipeTransform {
     this.nonEmptyFields = options?.nonEmptyFields ?? [];
     this.minSize = options?.minSize ?? 1;
   }
-  transform(dto: any) {
-    console.log(dto);
+  transform(dto: any, metaData: ArgumentMetadata) {
+    if (metaData.type !== 'body') return dto;
+
+    console.log(typeof dto, dto);
     const errorMsgs: string[] = [];
 
     this.nonEmptyFields.forEach((key) => {

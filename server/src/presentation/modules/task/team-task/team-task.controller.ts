@@ -26,6 +26,15 @@ import { TeamTaskUseCases } from 'src/application/use-cases/task/team-task/team-
 export class TeamTaskController {
   constructor(private readonly taskUseCases: TeamTaskUseCases) {}
 
+  @Get('list')
+  findAllTeamTasks(
+    @Req() req: CustomRequest,
+    @Param('team_id', ParseUUIDPipe) team_id: string,
+  ): Promise<Task[]> {
+    const requestUser = new User(req.user);
+    return this.taskUseCases.getAllTasks(team_id, requestUser);
+  }
+
   @Get(':task_id')
   findTeamTask(
     @Req() req: CustomRequest,
@@ -36,14 +45,6 @@ export class TeamTaskController {
     return this.taskUseCases.getTask(task_id, team_id, requestUser);
   }
 
-  @Get()
-  findAllTeamTasks(
-    @Req() req: CustomRequest,
-    @Param('team_id', ParseUUIDPipe) team_id: string,
-  ): Promise<Task[]> {
-    const requestUser = new User(req.user);
-    return this.taskUseCases.getAllTasks(team_id, requestUser);
-  }
 
   @Post()
   createTask(

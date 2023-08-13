@@ -18,6 +18,7 @@ import {
   TaskRepository,
 } from './';
 import { OtpRepository } from './otp.repository';
+import { RepositoryHelper } from './repository.helper';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { OtpRepository } from './otp.repository';
     ]),
   ],
   providers: [
+    RepositoryHelper,
     UserRepository,
     TeamRepository,
     TaskRepository,

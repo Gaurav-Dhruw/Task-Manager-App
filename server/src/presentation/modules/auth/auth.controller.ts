@@ -1,12 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Post,
-  Redirect,
-  Req,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req } from '@nestjs/common';
 import {
   GenerateVerificationLinkDto,
   LoginUserDto,
@@ -37,12 +29,11 @@ export class AuthController {
     return new LoginUserResponseDto({ ...user, token });
   }
 
-  @Redirect('', 302)
   @Post('sign-up')
   async registerUser(
     @Req() req: CustomRequest,
     @Body() userDto: RegisterUserDto,
-  ): Promise<void> {
+  ) {
     const inputUser = new User(userDto);
     const baseUrl = req.protocol + '://' + req.get('host');
 
@@ -50,6 +41,8 @@ export class AuthController {
       inputUser,
       baseUrl,
     });
+
+    return { message: 'verification link sent to the registered email' };
   }
 
   @Get('verify/:token')
@@ -66,7 +59,7 @@ export class AuthController {
   async generateVerificationLink(
     @Req() req: CustomRequest,
     @Body() dto: GenerateVerificationLinkDto,
-  ): Promise<void> {
+  ) {
     const otp = new Otp({
       email: dto.email,
       code: dto.otp,
@@ -75,5 +68,6 @@ export class AuthController {
     const baseUrl = req.protocol + '://' + req.get('host');
 
     await this.authUseCases.generateVerificationLink({ otp, baseUrl });
+    return { message: 'verfication link sent!' };
   }
 }

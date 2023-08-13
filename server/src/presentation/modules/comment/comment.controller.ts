@@ -31,7 +31,7 @@ export class CommentController {
     return this.commentUseCases.createComment(comment, team_id);
   }
 
-  @Get()
+  @Get('list')
   findAllComments(
     @Req() req: CustomRequest,
     @Param('team_id', ParseUUIDPipe) team_id: string,
@@ -48,7 +48,7 @@ export class CommentController {
 
     @Body() commentDto: UpdateCommentDto,
   ) {
-    const comment = new Comment({...commentDto, id: comment_id});
+    const comment = new Comment({ ...commentDto, id: comment_id });
     const requestUser = new User(req.user);
 
     return this.commentUseCases.updateComment(comment, requestUser);

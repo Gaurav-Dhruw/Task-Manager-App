@@ -1,11 +1,10 @@
 import {
-  BadRequestException,
-  ForbiddenException,
   Injectable,
 } from '@nestjs/common';
 import { IDataService } from 'src/domain/abstracts';
 import { Task, Team, User } from 'src/domain/entities';
 import { TeamTaskHelper } from './helpers/team-task.helper';
+import { RequestQuery } from 'src/domain/types/request-query.type';
 
 @Injectable()
 export class TeamTaskUseCases {
@@ -33,7 +32,11 @@ export class TeamTaskUseCases {
   }
 
   // Done
-  async getAllTasks(team_id: string, requestUser: User): Promise<Task[]> {
+  async getAllTasks(
+    team_id: string,
+    requestUser: User,
+    query?: RequestQuery,
+  ): Promise<Task[]> {
     const team = await this.dataService.team.getById(team_id);
 
     // Checks the team actually exists or not.
@@ -41,7 +44,13 @@ export class TeamTaskUseCases {
     // Checks if user is a memeber or not
     this.helper.checkTeamLevelAuthorization(team, requestUser);
 
-    return team.tasks;
+    const { where = {}, pagination, sort, search = '' } = query || {};
+
+    return this.dataService.task.getAll({
+      where: { ...where, team_id, title: search },
+      sort,
+      pagination,
+    });
   }
 
   // Done
@@ -78,14 +87,13 @@ export class TeamTaskUseCases {
       await this.dataService.team.getById(team_id),
     ]);
 
-
     // Validate team and task.
     this.helper.validateMutateInput(team, task);
     // Checks if provide task is indeed a team task and belongs to provided team;
     this.helper.validateMutateOperation(team, task);
 
     // Checks if user is one of the team members.
-    this.helper.checkTeamLevelAuthorization(team,requestUser);
+    this.helper.checkTeamLevelAuthorization(team, requestUser);
     // Checks if user is any of the assigned to task, task creator, or admin.
     this.helper.checkTaskLevelAuthorization(team, task, requestUser);
 
@@ -111,10 +119,10 @@ export class TeamTaskUseCases {
     this.helper.validateMutateOperation(team, task);
 
     // Checks if user is one of the team members.
-    this.helper.checkTeamLevelAuthorization(team,requestUser);
+    this.helper.checkTeamLevelAuthorization(team, requestUser);
     // Checks if user is any of task creator, or admin.
     this.helper.checkSpecialAuthorization(team, task, requestUser);
-    
+
     // Checks if the provided users are team members or not.
     this.helper.checkIfTeamMembers(team, assign);
 
@@ -143,8 +151,8 @@ export class TeamTaskUseCases {
     // Checks if provide task is indeed a team task and belongs to provided team;
     this.helper.validateMutateOperation(team, task);
 
-     // Checks if user is one of the team members.
-    this.helper.checkTeamLevelAuthorization(team,requestUser);
+    // Checks if user is one of the team members.
+    this.helper.checkTeamLevelAuthorization(team, requestUser);
     // Checks if user is any of task creator, or admin.
     this.helper.checkSpecialAuthorization(team, task, requestUser);
 

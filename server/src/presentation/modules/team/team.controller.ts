@@ -27,10 +27,11 @@ import { UpdateDtoValidationPipe } from 'src/presentation/common/pipes';
 export class TeamController {
   constructor(private readonly teamUseCases: TeamUseCases) {}
 
-  // @Get()
-  // getAllTeams() {
-  //   return this.teamUseCases.getAllTeams();
-  // }
+  @Get('list')
+  findAllTeams(@Req() req: CustomRequest) {
+    console.log(req.user);
+    return this.teamUseCases.getAllTeams(req.user?.id);
+  }
 
   @Get(':team_id')
   findTeam(
@@ -41,18 +42,12 @@ export class TeamController {
     return this.teamUseCases.getTeam(team_id, requestUser);
   }
 
-  @Get()
-  findAllTeams(@Req() req: CustomRequest) {
-    return this.teamUseCases.getAllTeams(req.user?.id);
-  }
-
   @Post()
   async createTeam(
     @Req() req: CustomRequest,
-    @Param('team_id', ParseUUIDPipe) team_id: string,
     @Body() teamDto: CreateTeamDto,
   ) {
-    const team = new Team({ ...teamDto, id: team_id });
+    const team = new Team(teamDto);
     const requestUser = new User(req.user);
     return this.teamUseCases.createTeam(team, requestUser);
   }

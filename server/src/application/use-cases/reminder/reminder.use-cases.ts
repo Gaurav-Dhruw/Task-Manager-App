@@ -1,12 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { IDataService, INotificationService } from 'src/domain/abstracts';
-import { Notification, Reminder, User } from 'src/domain/entities';
+import { IDataService } from 'src/domain/abstracts';
+import { Reminder } from 'src/domain/entities';
 
 @Injectable()
 export class ReminderUseCases {
-  constructor(
-    private readonly dataService: IDataService,
-  ) {}
+  constructor(private readonly dataService: IDataService) {}
 
   async deleteReminders(reminders: Reminder[]): Promise<void> {
     const ids: string[] = reminders.map((reminder) => reminder.id);
@@ -18,6 +16,4 @@ export class ReminderUseCases {
   //   const end = new Date(start.getTime() + 6 * 60 * 60 * 1000);
   //   return this.dataService.reminder.getAll({ between: { start, end } });
   // }
-
-
 }
