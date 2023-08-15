@@ -8,7 +8,7 @@ import {
 import { IDataService } from 'src/domain/abstracts';
 import { Team, User } from 'src/domain/entities';
 import { TeamUseCasesHelper } from './helpers/team-use-cases.helper';
-import { RequestQuery } from 'src/domain/types/request-query.type';
+import { IRequestQuery } from 'src/domain/types/request-query.type';
 
 @Injectable()
 export class TeamUseCases {
@@ -28,11 +28,14 @@ export class TeamUseCases {
     return team;
   }
 
-  getAllTeams(user_id: string, query?: RequestQuery): Promise<Team[]> {
-    const { pagination, where={}, search } = query || {};
+  getAllTeams(user_id: string, query?: IRequestQuery): Promise<Team[]> {
+    const { pagination, where = {}, search = '', sort } = query || {};
+    const { page = 1, limit = 10 } = pagination || {};
+
     return this.dataService.team.getAll({
       where: { ...where, user_id, team_name: search },
-      pagination,
+      sort,
+      pagination: { page, limit },
     });
   }
 

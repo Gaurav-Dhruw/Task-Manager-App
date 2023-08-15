@@ -1,5 +1,4 @@
 import {
-
   IsDateString,
   IsEnum,
   IsNotEmpty,
@@ -9,7 +8,7 @@ import {
 import { Task } from 'src/domain/entities';
 import { Priority } from 'src/domain/types';
 
-export class CreatePersonalTaskDto
+export class CreateTaskDto
   implements Omit<Task, 'id' | 'status' | 'assigned_to' | 'created_by'>
 {
   @IsString()

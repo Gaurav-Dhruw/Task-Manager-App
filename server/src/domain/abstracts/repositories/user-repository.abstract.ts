@@ -6,6 +6,7 @@ export abstract class IUserRepository implements IGenericRepository<User> {
     where?: {
       name?: string;
       email?: string;
+      is_verified?: boolean;
     };
     pagination?: { page: number; limit: number };
   }): Promise<User[]>;

@@ -31,15 +31,19 @@ export class ReminderRepository implements IReminderRepository {
       task_id,
       scheduled_for: where_scheduled_for,
     } = where || {};
+
     const { scheduled_for: sort_scheduled_for } = sort || {};
-    const { page = 1, limit = 10 } = pagination || {};
+
+    const { page, limit } = pagination || {};
 
     const queryOptions = {
-      where: {
-        user_id: { receivers: { id: user_id } },
-        task_id: { task: { id: task_id } },
-        scheduled_for: LessThanOrEqual(where_scheduled_for),
-      },
+      where: [
+        {
+          user_id: { receivers: { id: user_id } },
+          task_id: { task: { id: task_id } },
+          scheduled_for: LessThanOrEqual(where_scheduled_for),
+        },
+      ],
       sort: {
         scheduled_for: sort_scheduled_for,
       },
@@ -52,10 +56,7 @@ export class ReminderRepository implements IReminderRepository {
     const query = this.helper.buildQuery(options, queryOptions);
 
     return this.reminderRepository.find({
-      where: {
-        task: { id: task_id },
-        receivers: { id: user_id },
-      },
+      ...query,
       relations: ['receivers', 'task'],
     });
   }

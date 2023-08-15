@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 
-
 @Injectable()
 export class RepositoryHelper {
   constructor() {}
@@ -9,11 +8,19 @@ export class RepositoryHelper {
     let query: any = {};
 
     if (inputQueries?.where) {
-      let where = {};
-      for (const key in inputQueries.where) {
-        if (inputQueries.where[key] !== undefined && key in queryOptions.where)
-          where = { ...where, ...queryOptions.where[key] };
-      }
+      let where = [];
+
+      queryOptions.where.forEach((queryOption) => {
+        let individualQuery = {};
+
+        for (const key in inputQueries.where) {
+          if (inputQueries.where[key] !== undefined && key in queryOption)
+            individualQuery = { ...individualQuery, ...queryOption[key] };
+        }
+
+        where.push(individualQuery);
+      });
+
       query.where = where;
     }
 
@@ -27,7 +34,7 @@ export class RepositoryHelper {
     }
 
     if (inputQueries?.pagination) {
-      query = { ...query, ...inputQueries.pagination };
+      query = { ...query, ...queryOptions.pagination };
     }
     return query;
   }

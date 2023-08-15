@@ -10,7 +10,7 @@ export class CommentRepository implements ICommentRepository {
   constructor(
     @InjectRepository(Comment)
     private readonly commentRepository: Repository<Comment>,
-    private readonly helper : RepositoryHelper,
+    private readonly helper: RepositoryHelper,
   ) {}
 
   getById(id: string): Promise<Comment> {
@@ -34,31 +34,39 @@ export class CommentRepository implements ICommentRepository {
     });
   }
 
- getAll(options?: { where?: { task_id?: string; user_id?: string; }; sort?: { created_at?: 'desc' | 'asc'; }; pagination?: { page: number; limit: number; }; }): Promise<Comment[]> {
+  getAll(options?: {
+    where?: { task_id?: string; user_id?: string };
+    sort?: { created_at?: 'desc' | 'asc' };
+    pagination?: { page: number; limit: number };
+  }): Promise<Comment[]> {
+    const { where, sort, pagination } = options || {};
+    const { task_id, user_id } = where || {};
+    const { created_at } = sort || {};
+    const { page = 1, limit = 10 } = pagination || {};
 
-      const {where, sort, pagination} = options || {};
-      const {task_id, user_id} = where || {};
-      const {created_at} = sort || {};
-      const {page=1, limit=10} = pagination || {};
-
-      const queryOptions:any = {
-        where:{
-          task_id : {task:{id:task_id}},
-          user_id :{user:{id:user_id}},
+    const queryOptions: any = {
+      where: [
+        {
+          task_id: { task: { id: task_id } },
+          user_id: { user: { id: user_id } },
         },
-        sort:{
-          created_at,
-        },
-        pagination:{
-          take: limit,
-          skip: (page-1)*limit,
-        }
-      }
+      ],
+      sort: {
+        created_at,
+      },
+      pagination: {
+        take: limit,
+        skip: (page - 1) * limit,
+      },
+    };
 
-      const query = this.helper.buildQuery(options, queryOptions);
+    const query = this.helper.buildQuery(options, queryOptions);
 
-     return this.commentRepository.find({...query, relations:['user']});
- }
+    return this.commentRepository.find({
+      ...query,
+      relations: ['user'],
+    });
+  }
 
   create(comment: Comment): Promise<Comment> {
     return this.commentRepository.save(comment);

@@ -27,34 +27,40 @@ export class UserRepository implements IUserRepository {
     });
   }
 
-  getById(id: string): Promise<User> {
+  getById(user_id: string): Promise<User> {
     return this.userRepository.findOne({
       where: {
-        id,
+        id: user_id,
       },
     });
   }
 
-  getByIds(ids: string[]): Promise<User[]> {
+  getByIds(user_ids: string[]): Promise<User[]> {
     return this.userRepository.find({
-      where: { id: In(ids), is_verified: true },
+      where: { id: In(user_ids), is_verified: true },
     });
   }
 
   getAll(options?: {
-    where?: { name?: string; email?: string };
+    where?: { name?: string; email?: string; is_verified?: boolean };
     pagination?: { page: number; limit: number };
   }): Promise<User[]> {
     const { where, pagination } = options || {};
 
-    const { name, email } = where || {};
-    const { page=1, limit=10 } = pagination || {};
+    const { name, email, is_verified } = where || {};
+    const { page = 1, limit = 10 } = pagination || {};
 
     const queryOptions = {
-      where: {
-        name: { name: ILike(`%${name}%`) },
-        email: { email: ILike(`%${email}%`) },
-      },
+      where: [
+        {
+          name: { name: ILike(`%${name}%`) },
+          is_verified: { is_verified },
+        },
+        {
+          email: { email: ILike(`%${email}%`) },
+          is_verified: { is_verified },
+        },
+      ],
       pagination: {
         take: limit,
         skip: (page - 1) * limit,
@@ -62,9 +68,10 @@ export class UserRepository implements IUserRepository {
     };
 
     const query = this.helper.buildQuery(options, queryOptions);
+    // console.log(query);
+
     return this.userRepository.find({
-      where: { is_verified: true },
-      relations: ['tasks', 'teams'],
+      ...query,
     });
   }
 
@@ -72,7 +79,7 @@ export class UserRepository implements IUserRepository {
     return this.userRepository.save(user);
   }
 
-  update(id: string, user: User): Promise<User> {
+  update(user_id: string, user: User): Promise<User> {
     return this.userRepository.save(user);
   }
 }

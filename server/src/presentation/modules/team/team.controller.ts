@@ -7,6 +7,7 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
   Req,
   UsePipes,
 } from '@nestjs/common';
@@ -17,20 +18,27 @@ import {
   AddTeamMembersDto,
   CreateTeamDto,
   RemoveTeamMembersDto,
+  SearchTeamsDto,
   UpdateTeamDto,
   UpdateTeamResponseDto,
 } from './dtos';
 import { CustomRequest } from 'src/presentation/common/types';
-import { UpdateDtoValidationPipe } from 'src/presentation/common/pipes';
+import {
+  RequestQueryPipe,
+  UpdateDtoValidationPipe,
+} from 'src/presentation/common/pipes';
 
 @Controller('team')
 export class TeamController {
   constructor(private readonly teamUseCases: TeamUseCases) {}
 
   @Get('list')
-  findAllTeams(@Req() req: CustomRequest) {
-    console.log(req.user);
-    return this.teamUseCases.getAllTeams(req.user?.id);
+  findAllTeams(
+    @Req() req: CustomRequest,
+    @Query(RequestQueryPipe) query: SearchTeamsDto,
+  ) {
+    // console.log(query);
+    return this.teamUseCases.getAllTeams(req.user?.id, query as any);
   }
 
   @Get(':team_id')
@@ -43,10 +51,7 @@ export class TeamController {
   }
 
   @Post()
-  async createTeam(
-    @Req() req: CustomRequest,
-    @Body() teamDto: CreateTeamDto,
-  ) {
+  async createTeam(@Req() req: CustomRequest, @Body() teamDto: CreateTeamDto) {
     const team = new Team(teamDto);
     const requestUser = new User(req.user);
     return this.teamUseCases.createTeam(team, requestUser);

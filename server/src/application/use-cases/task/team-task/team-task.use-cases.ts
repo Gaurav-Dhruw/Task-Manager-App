@@ -1,10 +1,8 @@
-import {
-  Injectable,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { IDataService } from 'src/domain/abstracts';
 import { Task, Team, User } from 'src/domain/entities';
 import { TeamTaskHelper } from './helpers/team-task.helper';
-import { RequestQuery } from 'src/domain/types/request-query.type';
+import { IRequestQuery } from 'src/domain/types/request-query.type';
 
 @Injectable()
 export class TeamTaskUseCases {
@@ -22,6 +20,7 @@ export class TeamTaskUseCases {
     const team = await this.dataService.team.getById(team_id);
     // Checks the team actually exists or not.
     this.helper.validateCreateInput(team);
+    
     // Checks if user is a memeber or not
     this.helper.checkTeamLevelAuthorization(team, requestUser);
 
@@ -35,21 +34,23 @@ export class TeamTaskUseCases {
   async getAllTasks(
     team_id: string,
     requestUser: User,
-    query?: RequestQuery,
+    query?: IRequestQuery,
   ): Promise<Task[]> {
     const team = await this.dataService.team.getById(team_id);
 
     // Checks the team actually exists or not.
     this.helper.validateGetAllInput(team);
+    
     // Checks if user is a memeber or not
     this.helper.checkTeamLevelAuthorization(team, requestUser);
 
     const { where = {}, pagination, sort, search = '' } = query || {};
+    const { page = 1, limit = 10 } = pagination || {};
 
     return this.dataService.task.getAll({
-      where: { ...where, team_id, title: search },
+      where: { ...where, team_id, title: search, description: search },
       sort,
-      pagination,
+      pagination: { page, limit },
     });
   }
 
@@ -64,11 +65,9 @@ export class TeamTaskUseCases {
       await this.dataService.team.getById(team_id),
     ]);
 
-    // Checks the team and task actually exists or not.
+    // Checks if team and task exits. Also checks if provided task is
+    // indeed a team task and belongs to provided team;
     this.helper.validateGetInput(team, task);
-
-    // Checks if provide task is indeed a team task and belongs to provided team;
-    this.helper.validateGetOperation(team, task);
 
     // Checks if user is a memeber or not
     this.helper.checkTeamLevelAuthorization(team, requestUser);
@@ -87,10 +86,10 @@ export class TeamTaskUseCases {
       await this.dataService.team.getById(team_id),
     ]);
 
-    // Validate team and task.
+    // Checks if team and task exits. Also checks if provided task is 
+    // indeed a team task and belongs to provided team;
     this.helper.validateMutateInput(team, task);
-    // Checks if provide task is indeed a team task and belongs to provided team;
-    this.helper.validateMutateOperation(team, task);
+
 
     // Checks if user is one of the team members.
     this.helper.checkTeamLevelAuthorization(team, requestUser);
@@ -113,10 +112,9 @@ export class TeamTaskUseCases {
       await this.dataService.task.getById(task_id),
       await this.dataService.team.getById(team_id),
     ]);
-    // Validate team task.
+    // Checks if team and task exits. Also checks if provided task is
+    // indeed a team task and belongs to provided team;
     this.helper.validateMutateInput(team, task);
-    // Checks if provide task is indeed a team task and belongs to provided team;
-    this.helper.validateMutateOperation(team, task);
 
     // Checks if user is one of the team members.
     this.helper.checkTeamLevelAuthorization(team, requestUser);
@@ -146,10 +144,10 @@ export class TeamTaskUseCases {
       await this.dataService.task.getById(task_id),
       await this.dataService.team.getById(team_id),
     ]);
-    // Validate team and task.
+    // Checks if team and task exits. Also checks if provided task is
+    // indeed a team task and belongs to provided team;
     this.helper.validateMutateInput(team, task);
-    // Checks if provide task is indeed a team task and belongs to provided team;
-    this.helper.validateMutateOperation(team, task);
+
 
     // Checks if user is one of the team members.
     this.helper.checkTeamLevelAuthorization(team, requestUser);
@@ -178,11 +176,9 @@ export class TeamTaskUseCases {
       await this.dataService.task.getById(task_id),
       await this.dataService.team.getById(team_id),
     ]);
-    // Validate team  and task.
+    // Checks if team and task exits. Also checks if provided task is
+    // indeed a team task and belongs to provided team;
     this.helper.validateMutateInput(team, task);
-
-    // Checks if provide task is indeed a team task and belongs to provided team;
-    this.helper.validateMutateOperation(team, task);
 
     // Checks if user is any of the task creator or admin.
     this.helper.checkTaskLevelAuthorization(team, task, requestUser);

@@ -28,7 +28,7 @@ export class TaskRepository implements ITaskRepository {
 
   getAll(options?: {
     where?: {
-      team_id?:string;
+      team_id?: string;
       user_id?: string;
       title?: string;
       description?: string;
@@ -44,22 +44,35 @@ export class TaskRepository implements ITaskRepository {
       team_id,
       user_id,
       title,
+      description,
       status,
       priority,
       deadline: where_deadline,
     } = where || {};
+
     const { deadline: sort_deadline } = sort || {};
-    const { page = 1, limit = 10 } = pagination || {};
+
+    const { page, limit } = pagination || {};
 
     const queryOptions = {
-      where: {
-        team_id: { team: { id: team_id } },
-        user_id: { assigned_to: { id: user_id } },
-        title: { title: ILike(`%${title}%`) },
-        status: { status },
-        priority: { priority },
-        deadline: { deadline: LessThanOrEqual(where_deadline) },
-      },
+      where: [
+        {
+          team_id: { team: { id: team_id } },
+          user_id: { assigned_to: { id: user_id } },
+          title: { title: ILike(`%${title}%`) },
+          status: { status },
+          priority: { priority },
+          deadline: { deadline: LessThanOrEqual(where_deadline) },
+        },
+        {
+          team_id: { team: { id: team_id } },
+          user_id: { assigned_to: { id: user_id } },
+          description: { description: ILike(`%${description}%`) },
+          status: { status },
+          priority: { priority },
+          deadline: { deadline: LessThanOrEqual(where_deadline) },
+        },
+      ],
       sort: {
         deadline: sort_deadline,
       },
@@ -74,7 +87,7 @@ export class TaskRepository implements ITaskRepository {
     // const filter = {
     //   ...{ title: ILike('%nam%'), description: ILike('%nam%') },
     // };
-    console.log(query);
+    console.log(options, query);
     return this.taskRepository.find({
       ...query,
     });

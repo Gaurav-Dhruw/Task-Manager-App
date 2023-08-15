@@ -1,4 +1,4 @@
-export interface RequestQuery {
+export interface IRequestQuery {
   search?: string;
   where?: object;
   sort?: object;

@@ -28,13 +28,15 @@ export class NotificationRepository implements INotificationRepository {
     const { where, sort, pagination } = options || {};
     const { user_id, is_read } = where || {};
     const { created_at } = sort || {};
-    const { page = 1, limit = 10 } = pagination || {};
+    const { page, limit } = pagination || {};
 
     const queryOptions = {
-      where: {
-        user_id: { receiver: { id: user_id } },
-        is_read: { is_read },
-      },
+      where: [
+        {
+          user_id: { receiver: { id: user_id } },
+          is_read: { is_read },
+        },
+      ],
       sort: {
         created_at,
       },
@@ -45,7 +47,7 @@ export class NotificationRepository implements INotificationRepository {
     };
 
     const query = this.helper.buildQuery(options, queryOptions);
-
+    // console.log(query);
     return this.notificationRepository.find({
       ...query,
       relations: ['receiver'],

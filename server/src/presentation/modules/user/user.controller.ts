@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Patch, Req, UsePipes } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Patch,
+  Query,
+  Req,
+  UsePipes,
+} from '@nestjs/common';
 
 import { Otp, User } from 'src/domain/entities';
 import {
@@ -6,19 +14,25 @@ import {
   UpdateUserResponseDto,
   UpdateCredentialsDto,
   UpdateCredentialsResponseDto,
+  SearchUsersDto,
 } from './dtos';
 import { UserUseCases } from 'src/application/use-cases/user/user.use-cases';
 import { CustomRequest } from 'src/presentation/common/types';
-import { UpdateDtoValidationPipe } from 'src/presentation/common/pipes';
+import {
+  RequestQueryPipe,
+  UpdateDtoValidationPipe,
+} from 'src/presentation/common/pipes';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userUseCases: UserUseCases) {}
 
-  // @Get('get-all')
-  // findAllUsers() {
-  //   return this.userUseCases.getAllUsers();
-  // }
+  // @UsePipes(new QueryParameterPipe())
+  @Get('list')
+  findAllUsers(@Query(RequestQueryPipe) query: SearchUsersDto) {
+    
+    return this.userUseCases.getAllUsers(query);
+  }
 
   @UsePipes(new UpdateDtoValidationPipe({ nonEmptyFields: ['name'] }))
   @Patch('update/profile')

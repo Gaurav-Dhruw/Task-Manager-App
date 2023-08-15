@@ -6,7 +6,7 @@ import {
 import { IDataService, IHashService } from 'src/domain/abstracts';
 import { Otp, User } from 'src/domain/entities';
 import { OtpUseCases } from '../otp/otp.use-cases';
-import { RequestQuery } from 'src/domain/types/request-query.type';
+import { IRequestQuery } from 'src/domain/types/request-query.type';
 
 @Injectable()
 export class UserUseCases {
@@ -17,11 +17,7 @@ export class UserUseCases {
   ) {}
 
   async updateUser(inputUser: User): Promise<User> {
-    const user = await this.dataService.user.getById(inputUser.id);
-
-    const updatedUser = { ...user, ...inputUser };
-
-    return this.dataService.user.update(inputUser.id, updatedUser);
+    return this.dataService.user.update(inputUser.id, inputUser);
   }
 
   async updateCredentials(data: {
@@ -57,11 +53,13 @@ export class UserUseCases {
     return this.dataService.user.getByIds(users_ids);
   }
 
-  getAllUsers(query?: RequestQuery) {
-    const { pagination, where={}, search } = query || {};
+  getAllUsers(query?: IRequestQuery) {
+    const { pagination, search = '' } = query || {};
+    const { page = 1, limit = 10 } = pagination || {};
 
     return this.dataService.user.getAll({
-      where: {...where, name: search, email: search },
-      pagination });
+      where: { is_verified: true, name: search, email: search },
+      pagination: { page, limit },
+    });
   }
 }

@@ -9,25 +9,23 @@ import {
   Post,
   Req,
   UsePipes,
+  Query
 } from '@nestjs/common';
 import { Task, User } from 'src/domain/entities';
-import { UpdateDtoValidationPipe } from 'src/presentation/common/pipes';
+import { RequestQueryPipe, UpdateDtoValidationPipe } from 'src/presentation/common/pipes';
 import { CustomRequest } from 'src/presentation/common/types';
-import {
-  CreatePersonalTaskDto,
-  GetPersonalTaskResponseDto,
-  UpdatePersonalTaskDto,
-  UpdatePersonalTaskResponseDto,
-} from './dtos';
+import { CreateTaskDto, SearchTasksDto, UpdateTaskDto, UpdateTaskResponseDto } from '../dtos';
+import { GetPersonalTaskResponseDto } from './dtos';
 import { PersonalTaskUseCases } from 'src/application/use-cases/task/personal-task/personal-task.use-cases';
+import { IRequestQuery } from 'src/domain/types/request-query.type';
 
 @Controller('user/task')
 export class PersonalTaskController {
   constructor(private readonly taskUseCases: PersonalTaskUseCases) {}
-  
+
   @Get('list')
-  findAllTasks(@Req() req: CustomRequest): Promise<Task[]> {
-    return this.taskUseCases.getAssignedTasks(req.user.id);
+  findAllTasks(@Req() req: CustomRequest, @Query(RequestQueryPipe) query: SearchTasksDto): Promise<Task[]> {
+    return this.taskUseCases.getAssignedTasks(req.user.id, query as any);
   }
 
   @Get(':task_id')
@@ -43,27 +41,29 @@ export class PersonalTaskController {
   @Post()
   createPersonalTask(
     @Req() req: CustomRequest,
-    @Body() taskDto: CreatePersonalTaskDto,
+    @Body() taskDto: CreateTaskDto,
   ): Promise<Task> {
     const requestUser = new User(req.user);
     const taskInput = new Task(taskDto);
     return this.taskUseCases.createTask(taskInput, requestUser);
   }
 
-  @UsePipes(new UpdateDtoValidationPipe({nonEmptyFields:['status', 'title']}))
+  @UsePipes(
+    new UpdateDtoValidationPipe({ nonEmptyFields: ['status', 'title'] }),
+  )
   @Patch(':task_id')
   async updateTask(
     @Req() req: CustomRequest,
     @Param('task_id', ParseUUIDPipe) task_id: string,
-    @Body() taskDto: UpdatePersonalTaskDto,
-  ): Promise<UpdatePersonalTaskResponseDto> {
+    @Body() taskDto: UpdateTaskDto,
+  ): Promise<UpdateTaskResponseDto> {
     const requestUser = new User(req.user);
-    const personalTask = new Task({...taskDto, id:task_id});
+    const personalTask = new Task({ ...taskDto, id: task_id });
     const updatedTask = await this.taskUseCases.updateTask(
       personalTask,
       requestUser,
     );
-    const res = new UpdatePersonalTaskResponseDto(updatedTask);
+    const res = new UpdateTaskResponseDto(updatedTask);
 
     return res;
   }

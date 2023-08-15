@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { IDataService } from 'src/domain/abstracts';
 import { Comment, User } from 'src/domain/entities';
 import { CommentUseCasesHelper } from './helpers/comment-use-cases.helper';
-import { RequestQuery } from 'src/domain/types/request-query.type';
+import { IRequestQuery } from 'src/domain/types/request-query.type';
 
 @Injectable()
 export class CommentUseCases {
@@ -39,7 +39,7 @@ export class CommentUseCases {
     team_id: string,
     task_id: string,
     requestUser: User,
-    query?: RequestQuery,
+    query?: IRequestQuery,
   ) {
     const [task, team] = await Promise.all([
       await this.dataService.task.getById(task_id),
@@ -51,12 +51,12 @@ export class CommentUseCases {
     // checks if user is a team memeber.
     this.helper.checkCRAuthorization(team, requestUser);
 
-    const { pagination } = query || {};
+    const { page = 1, limit = 10 } = query?.pagination || {};
 
     return this.dataService.comment.getAll({
       where: { task_id },
       sort: { created_at: 'desc' },
-      pagination,
+      pagination: { page, limit },
     });
   }
 

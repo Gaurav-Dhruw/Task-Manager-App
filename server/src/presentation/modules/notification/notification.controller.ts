@@ -7,21 +7,24 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
   Req,
 } from '@nestjs/common';
 import { NotificationUseCases } from 'src/application/use-cases/notification/notification.use-cases';
 import { Notification, User } from 'src/domain/entities';
 import { CustomRequest } from 'src/presentation/common/types';
 import { UpdateNotificationResponseDto } from './dtos/update-notification-response.dto';
+import { RequestQueryPipe } from 'src/presentation/common/pipes';
+import { PaginationDto } from 'src/presentation/common/dtos';
 
 @Controller('user/notification')
 export class NotificationController {
   constructor(private readonly notificationUseCases: NotificationUseCases) {}
 
   @Get('list')
-  findAllNotifications(@Req() req: CustomRequest): Promise<Notification[]> {
+  findAllNotifications(@Req() req: CustomRequest, @Query(RequestQueryPipe) query: PaginationDto): Promise<Notification[]> {
     const requestedUser = new User(req.user);
-    return this.notificationUseCases.getAllNotifications(requestedUser.id);
+    return this.notificationUseCases.getAllNotifications(requestedUser.id, query as any);
   }
 
   @Post()

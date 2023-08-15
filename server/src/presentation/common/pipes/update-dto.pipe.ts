@@ -17,7 +17,6 @@ export class UpdateDtoValidationPipe implements PipeTransform {
   transform(dto: any, metaData: ArgumentMetadata) {
     if (metaData.type !== 'body') return dto;
 
-    console.log(typeof dto, dto);
     const errorMsgs: string[] = [];
 
     this.nonEmptyFields.forEach((key) => {

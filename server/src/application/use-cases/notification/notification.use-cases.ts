@@ -6,7 +6,7 @@ import {
 import { IDataService } from 'src/domain/abstracts';
 import { Notification, User } from 'src/domain/entities';
 import { NotificationUseCasesHelper } from './helpers/notification-use-cases.helper';
-import { RequestQuery } from 'src/domain/types/request-query.type';
+import { IRequestQuery } from 'src/domain/types/request-query.type';
 
 @Injectable()
 export class NotificationUseCases {
@@ -29,13 +29,14 @@ export class NotificationUseCases {
   //Done
   async getAllNotifications(
     user_id: string,
-    query?: RequestQuery,
+    query?: IRequestQuery,
   ): Promise<Notification[]> {
-    const { pagination } = query || {};
+    const { page = 1, limit = 10 } = query?.pagination || {};
+
     return this.dataService.notification.getAll({
       where: { user_id },
       sort: { created_at: 'desc' },
-      pagination,
+      pagination: { page, limit },
     });
   }
 

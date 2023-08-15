@@ -6,7 +6,7 @@ import {
 import { IDataService } from 'src/domain/abstracts';
 import { Task, User } from 'src/domain/entities';
 import { PersonalTaskHelper } from './helpers/personal-task.helper';
-import { RequestQuery } from 'src/domain/types/request-query.type';
+import { IRequestQuery } from 'src/domain/types/request-query.type';
 
 @Injectable()
 export class PersonalTaskUseCases {
@@ -16,8 +16,9 @@ export class PersonalTaskUseCases {
   ) {}
 
   // Done
-  getAssignedTasks(user_id: string, query?: RequestQuery): Promise<Task[]> {
+  getAssignedTasks(user_id: string, query?: IRequestQuery): Promise<Task[]> {
     const { search = '', pagination, where = {}, sort } = query || {};
+    const { page = 1, limit = 10 } = pagination || {};
 
     return this.dataService.task.getAll({
       where: {
@@ -27,7 +28,7 @@ export class PersonalTaskUseCases {
         description: search,
       },
       sort,
-      pagination,
+      pagination: { page, limit },
     });
   }
 

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
 import { ITokenService } from 'src/domain/abstracts';
 import { User } from 'src/domain/entities';
-import { TokenExpiration, TokenPayload } from 'src/domain/types';
+import { TokenExpiration, ITokenPayload } from 'src/domain/types';
 
 @Injectable()
 export class JwtService implements ITokenService {
@@ -28,12 +28,12 @@ export class JwtService implements ITokenService {
     });
   }
 
-  decodeToken(token: string): TokenPayload | undefined {
+  decodeToken(token: string): ITokenPayload | undefined {
     try {
       const decoded = this.jwt.verify(token, this.secretKey);
 
       if (this.isJwtPayload(decoded)) {
-        const { id, email } = decoded as TokenPayload;
+        const { id, email } = decoded as ITokenPayload;
 
         return { id, email };
       }

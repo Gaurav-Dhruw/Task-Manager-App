@@ -28,13 +28,15 @@ export class TeamRepository implements ITeamRepository {
 
     const { user_id, team_name: where_team_name } = where || {};
     const { team_name: sort_team_name } = sort || {};
-    const { page = 1, limit = 10 } = pagination || {};
-
+    const { page, limit} = pagination || {};
+    // console.log(where_team_name);
     const queryOptions = {
-      where: {
-        user_id: { members: { id: user_id } },
-        team_name: { team_name: ILike(`%${where_team_name}%`) },
-      },
+      where: [
+        {
+          user_id: { members: { id: user_id } },
+          team_name: { team_name: ILike(`%${where_team_name}%`) },
+        },
+      ],
       sort: {
         team_name: sort_team_name,
       },
@@ -45,7 +47,7 @@ export class TeamRepository implements ITeamRepository {
     };
 
     const query = this.helper.buildQuery(options, queryOptions);
-
+    // console.log(query);
     return this.teamRepository.find({
       ...query,
     });
