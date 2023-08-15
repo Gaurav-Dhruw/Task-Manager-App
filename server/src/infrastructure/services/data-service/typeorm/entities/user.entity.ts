@@ -29,7 +29,8 @@ export class User {
   profile_pic?: string;
 
   @Column({
-    default:false,
+    default: false,
+    select: false,
   })
   is_verified: boolean;
 

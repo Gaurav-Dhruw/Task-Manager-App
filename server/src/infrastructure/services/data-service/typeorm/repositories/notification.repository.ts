@@ -3,12 +3,14 @@ import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { INotificationRepository } from 'src/domain/abstracts';
 import { InjectRepository } from '@nestjs/typeorm';
+import { RepositoryHelper } from './repository.helper';
 
 @Injectable()
 export class NotificationRepository implements INotificationRepository {
   constructor(
     @InjectRepository(Notification)
     private readonly notificationRepository: Repository<Notification>,
+    private readonly helper: RepositoryHelper,
   ) {}
 
   getById(id: string): Promise<Notification> {
@@ -19,30 +21,36 @@ export class NotificationRepository implements INotificationRepository {
   }
 
   getAll(options?: {
-    user_id?: string;
-    skip?: number;
-    take?: number;
+    where?: { user_id?: string; is_read?: boolean };
+    sort?: { created_at?: 'desc' | 'asc' };
+    pagination?: { page: number; limit: number };
   }): Promise<Notification[]> {
-    const { user_id } = options || {};
-    return this.notificationRepository.find({
-      where: {
-        receiver: { id: user_id },
-      },
-      relations: ['receiver'],
-      select: {
-        id: true,
-        title: true,
-        content: true,
-        receiver: {
-          id: true,
-          name: true,
-          email: true,
+    const { where, sort, pagination } = options || {};
+    const { user_id, is_read } = where || {};
+    const { created_at } = sort || {};
+    const { page, limit } = pagination || {};
+
+    const queryOptions = {
+      where: [
+        {
+          user_id: { receiver: { id: user_id } },
+          is_read: { is_read },
         },
-        created_at: true,
+      ],
+      sort: {
+        created_at,
       },
-      order: { created_at: 'DESC' },
-      // take: take || 10,
-      // skip: (skip - 1) * take,
+      pagination: {
+        take: limit,
+        skip: (page - 1) * limit,
+      },
+    };
+
+    const query = this.helper.buildQuery(options, queryOptions);
+    // console.log(query);
+    return this.notificationRepository.find({
+      ...query,
+      relations: ['receiver'],
     });
   }
 

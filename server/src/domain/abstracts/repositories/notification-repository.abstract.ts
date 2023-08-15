@@ -4,15 +4,27 @@ import { IGenericRepository } from '.';
 export abstract class INotificationRepository
   implements IGenericRepository<Notification>
 {
-  abstract getById(id: string): Promise<Notification>;
-  abstract getAll(options?: {
-    user_id?: string;
-    is_read?: boolean;
-  }): Promise<Notification[]>;
-  abstract create(item: Notification): Promise<Notification>;
-  abstract createMany(items: Notification[]): Promise<Notification[]>;
+  abstract getById(notification_id: string): Promise<Notification>;
 
-  abstract update(id: string, item: Notification): Promise<Notification>;
-  abstract updateMany(item: Notification[]): Promise<Notification[]>;
-  abstract delete(id: string): Promise<void>;
+  abstract getAll(options?: {
+    where?: {
+      user_id?: string;
+      is_read?: boolean;
+    };
+    sort?: {
+      created_at?: 'desc' | 'asc';
+    };
+    pagination?: { page: number; limit: number };
+  }): Promise<Notification[]>;
+
+  abstract create(notification: Notification): Promise<Notification>;
+  abstract createMany(notifications: Notification[]): Promise<Notification[]>;
+
+  abstract update(
+    notification_id: string,
+    notification: Notification,
+  ): Promise<Notification>;
+
+  abstract updateMany(notifications: Notification[]): Promise<Notification[]>;
+  abstract delete(notification_id: string): Promise<void>;
 }

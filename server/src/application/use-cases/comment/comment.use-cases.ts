@@ -1,9 +1,8 @@
-import {
-  Injectable,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { IDataService } from 'src/domain/abstracts';
 import { Comment, User } from 'src/domain/entities';
 import { CommentUseCasesHelper } from './helpers/comment-use-cases.helper';
+import { IRequestQuery } from 'src/domain/types/request-query.type';
 
 @Injectable()
 export class CommentUseCases {
@@ -25,10 +24,10 @@ export class CommentUseCases {
       await this.dataService.team.getById(team_id),
     ]);
 
-    // checks for team and task existance.
+    // checks for team and task existance
+    // and whether task belongs to the provided team.
     this.helper.validateCRInput(team, task);
-    // checks whether task belongs to the provided team.
-    this.helper.validateCROperation(team, task);
+
     // checks if user is a team memeber.
     this.helper.checkCRAuthorization(team, requestUser);
     inputComment.created_at = new Date();
@@ -36,19 +35,29 @@ export class CommentUseCases {
     return this.dataService.comment.create(inputComment);
   }
 
-  async getAllComments(team_id:string, task_id:string, requestUser:User){
+  async getAllComments(
+    team_id: string,
+    task_id: string,
+    requestUser: User,
+    query?: IRequestQuery,
+  ) {
     const [task, team] = await Promise.all([
       await this.dataService.task.getById(task_id),
       await this.dataService.team.getById(team_id),
     ]);
-    // checks for team and task existance.
-    this.helper.validateCRInput(team,task);
-    // checks whether task belongs to the provided team.
-    this.helper.validateCROperation(team, task);
+    // checks for team and task existance
+    // and whether task belongs to the provided team.
+    this.helper.validateCRInput(team, task);
     // checks if user is a team memeber.
     this.helper.checkCRAuthorization(team, requestUser);
 
-    return this.dataService.comment.getAll({task_id});
+    const { page = 1, limit = 10 } = query?.pagination || {};
+
+    return this.dataService.comment.getAll({
+      where: { task_id },
+      sort: { created_at: 'desc' },
+      pagination: { page, limit },
+    });
   }
 
   //Done
@@ -57,7 +66,7 @@ export class CommentUseCases {
     requestUser: User,
   ): Promise<Comment> {
     const comment = await this.dataService.comment.getById(inputComment.id);
-  
+
     // Checks for comment existance.
     this.helper.validateMutateInput(comment);
     // Checks if the user is the commentor.

@@ -6,6 +6,7 @@ import { CommentModule } from './comment/comment.module';
 import { ReminderModule } from './reminder/reminder.module';
 import { NotificationModule } from './notification/notification.module';
 import { AuthModule } from './auth/auth.module';
+import { OtpModule } from './otp/otp.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { AuthModule } from './auth/auth.module';
     CommentModule,
     ReminderModule,
     NotificationModule,
+    OtpModule,
   ],
   exports: [
     AuthModule,
@@ -25,6 +27,7 @@ import { AuthModule } from './auth/auth.module';
     CommentModule,
     ReminderModule,
     NotificationModule,
+    OtpModule,
   ],
 })
 export class ControllersModule {}

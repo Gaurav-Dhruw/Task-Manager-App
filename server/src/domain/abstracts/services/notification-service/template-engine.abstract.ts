@@ -1,6 +1,6 @@
-import { NotificationTemplate } from "src/domain/types";
+import { INotificationTemplate } from "src/domain/types";
 
 export abstract class ITemplateEngine {
-    abstract convert(data:NotificationTemplate):string;
+    abstract convert(data:INotificationTemplate):string;
 
 }

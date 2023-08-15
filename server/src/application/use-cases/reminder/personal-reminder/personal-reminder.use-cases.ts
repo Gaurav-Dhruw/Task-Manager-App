@@ -16,7 +16,7 @@ export class PersonalReminderUseCases {
     inputReminder: Reminder,
     requestUser: User,
   ): Promise<Reminder> {
-    const task_id = inputReminder.task.id;
+    const task_id = inputReminder.task?.id;
     const schedule = inputReminder.scheduled_for;
     const task = await this.dataService.task.getById(task_id);
 

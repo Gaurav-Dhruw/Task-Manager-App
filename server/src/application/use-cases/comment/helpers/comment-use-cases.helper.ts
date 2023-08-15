@@ -21,12 +21,12 @@ export class CommentUseCasesHelper {
     if (!team) errorMsgs.push('Team Not Found');
 
     if (errorMsgs.length > 0) throw new NotFoundException(errorMsgs);
-  }
 
-  validateCROperation(team: Team, task: Task) {
     const taskBelongsToTheTeam = task.team?.id === team?.id;
     if (!taskBelongsToTheTeam) throw new BadRequestException();
   }
+
+
   checkCRAuthorization(team: Team, user: User) {
     const isMember = this.authorizationHelper.isTeamMember(team, user);
     if (!isMember) throw new UnauthorizedException('User Unauthorized');

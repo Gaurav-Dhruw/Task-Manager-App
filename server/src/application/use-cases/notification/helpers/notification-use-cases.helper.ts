@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { Notification, User } from 'src/domain/entities';
 
 @Injectable()
@@ -14,5 +14,13 @@ export class NotificationUseCasesHelper {
       throw new UnauthorizedException('User Unauthorized');
   }
 
+  validateMarkReadOperation(notification: Notification) {
+    if (notification.is_read)
+      throw new BadRequestException('Notification Already Marked As Read');
+  }
 
+  validateMarkAllReadOperation(notifications: Notification[]) {
+    if (!notifications.length)
+      throw new BadRequestException('No Unread Notificaitons');
+  }
 }

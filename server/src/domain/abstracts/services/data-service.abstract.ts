@@ -6,6 +6,7 @@ import {
   ITeamRepository,
   IUserRepository,
 } from '../';
+import { IOtpRepository } from '../repositories/otp-repository.abstract';
 
 export abstract class IDataService {
   abstract user: IUserRepository;
@@ -14,4 +15,5 @@ export abstract class IDataService {
   abstract comment: ICommentRepository;
   abstract reminder: IReminderRepository;
   abstract notification: INotificationRepository;
+  abstract otp: IOtpRepository;
 }

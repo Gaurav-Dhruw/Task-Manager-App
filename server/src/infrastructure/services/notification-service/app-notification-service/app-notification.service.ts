@@ -10,10 +10,10 @@ import {
 import { Server, Socket } from 'socket.io';
 import { IAppNotificationService, ITokenService } from 'src/domain/abstracts';
 import { Notification } from 'src/domain/entities';
-import { TokenPayload } from 'src/domain/types';
+import { ITokenPayload } from 'src/domain/types';
 
 interface CustomSocket extends Socket {
-  user: TokenPayload;
+  user: ITokenPayload;
 }
 @WebSocketGateway()
 @Injectable()

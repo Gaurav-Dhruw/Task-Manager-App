@@ -1,7 +1,6 @@
 import { IsDateString, IsNotEmpty, IsUUID } from 'class-validator';
+import { CreateReminderDto } from './create-reminder.dto';
 
-export class UpdateReminderDto {
-  @IsDateString()
-  @IsNotEmpty()
-  scheduled_for: Date;
+export class UpdateReminderDto extends CreateReminderDto {
+
 }

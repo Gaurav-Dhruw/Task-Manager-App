@@ -3,7 +3,7 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Notification } from 'src/domain/entities';
+import { Notification, Otp } from 'src/domain/entities';
 import {
   IHashService,
   ITokenService,
@@ -12,9 +12,14 @@ import {
   ITemplateEngine,
 } from 'src/domain/abstracts';
 import { User } from 'src/domain/entities';
-import { ConfirmationTemplate, EmailTemplate, WelcomeTemplate } from 'src/domain/types';
+import {
+  IVerificationTemplate,
+  IEmailTemplate,
+  IWelcomeTemplate,
+} from 'src/domain/types';
 import { NotificationUseCases } from '../notification/notification.use-cases';
 import { AuthUseCasesHelper } from './helpers/auth-use-cases.helper';
+import { OtpUseCases } from '../otp/otp.use-cases';
 
 @Injectable()
 export class AuthUseCases {
@@ -26,6 +31,7 @@ export class AuthUseCases {
     private readonly tokenService: ITokenService,
     private readonly notificationService: INotificationService,
     private readonly notificationUseCases: NotificationUseCases,
+    private readonly otpUseCases: OtpUseCases,
   ) {}
   async loginUser(inputUser: User): Promise<User> {
     const user = await this.dataService.user.getByEmail(inputUser.email);
@@ -58,25 +64,18 @@ export class AuthUseCases {
       user,
     });
 
-    // Generating a html template string for email.
-    const templateString = this.templateEngine.convert({
-      template: 'confirmation',
+    // Sending Verification mails.
+    const emailOption: IVerificationTemplate = {
+      subject: 'Email Verification',
+      to: user.email,
+      template: 'verification',
       context: {
         username: user.name,
         verification_url,
       },
-    } as ConfirmationTemplate);
-
-    // Sending Verification mails.
-    this.notificationService.email.sendMails([
-      {
-        subject: 'Email Verification',
-        to: user.email,
-        context: {
-          content: templateString,
-        },
-      },
-    ]);
+    };
+    
+    this.notificationService.email.sendMails([emailOption]);
   }
 
   async verifyUser(token: string): Promise<User> {
@@ -94,27 +93,29 @@ export class AuthUseCases {
     user.is_verified = true;
 
     // Generating html template string for notificaions.
-    const templateString = this.templateEngine.convert({
+    const templateInfo: IWelcomeTemplate = {
       template: 'welcome',
       context: {
         username: user.name,
       },
-    } as WelcomeTemplate);
+    };
+    const templateString = this.templateEngine.convert(templateInfo);
 
     const notification = new Notification({
       receiver: user,
-      title: 'Welcome to Task-Manager',
+      title: 'Welcome to Task Manager',
       content: templateString,
       created_at: new Date(),
     });
 
-    const emailOption:EmailTemplate = {
-      subject:notification.title,
+    const emailOption: IEmailTemplate = {
+      subject: notification.title,
       to: notification.receiver?.email,
-      context:{
+      template: 'email-cover',
+      context: {
         content: templateString,
-      }
-    }
+      },
+    };
 
     // Sending welcome mail, creating a welcome notification, and updating user status.
     const [_, __, verifiedUser] = await Promise.all([
@@ -125,42 +126,36 @@ export class AuthUseCases {
     return verifiedUser;
   }
 
-  async generateVerificationLink(data: { inputUser: User; baseUrl: string }) {
-    const { inputUser, baseUrl } = data;
-    const user = await this.dataService.user.getByEmail(inputUser.email);
+  async generateVerificationLink(data: { otp: Otp, baseUrl: string }) {
+    const { otp, baseUrl } = data;
+    const [user, otp_verified] = await Promise.all([
+      this.dataService.user.getByEmail(otp.email),
+      this.otpUseCases.verifyAndInvalidateOtp(otp)
+    ]);
 
     this.helper.validateInput(user);
-
-    if (!this.hashService.verify(inputUser.password, user.password)) {
-      throw new UnauthorizedException('User Unauthoriazed');
-    }
-    // console.log(user);
     if (user.is_verified)
       throw new BadRequestException('User Already Verified');
+    else if(!otp_verified)
+      throw new BadRequestException('Invalid OTP');
+
 
     const verification_url = this.helper.generateVerificationUrl({
       baseUrl,
       user,
     });
 
-    // Generating a html template string for email.
-    const templateString = this.templateEngine.convert({
-      template: 'confirmation',
+    // Sending Verification mails.
+    const emailOption: IVerificationTemplate = {
+      to: user.email,
+      subject: 'Email Verification',
+      template: 'verification',
       context: {
         username: user.name,
         verification_url,
       },
-    } as ConfirmationTemplate);
-
-    // Sending Verification mails.
-    this.notificationService.email.sendMails([
-      {
-        subject: 'Email Verification',
-        to: user.email,
-        context: {
-          content: templateString,
-        },
-      },
-    ]);
+    };
+    
+    this.notificationService.email.sendMails([emailOption]);
   }
 }

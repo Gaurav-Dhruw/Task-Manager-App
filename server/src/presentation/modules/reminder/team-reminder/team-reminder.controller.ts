@@ -9,7 +9,7 @@ import {
   Req,
 } from '@nestjs/common';
 import { CustomRequest } from 'src/presentation/common/types';
-import { UpdateReminderDto, createReminderDto } from '../dtos';
+import { UpdateReminderDto, CreateReminderDto } from '../dtos';
 import { Reminder, Task, User } from 'src/domain/entities';
 import { TeamReminderUseCases } from 'src/application/use-cases/reminder/team-reminder/team-reminder.use-cases';
 
@@ -23,7 +23,7 @@ export class TeamReminderController {
     @Param('team_id', ParseUUIDPipe) team_id: string,
     @Param('task_id', ParseUUIDPipe) task_id: string,
 
-    @Body() reminderDto: createReminderDto,
+    @Body() reminderDto: CreateReminderDto,
   ) {
     const reminderInput = new Reminder(reminderDto);
     reminderInput.task = new Task({ id: task_id });

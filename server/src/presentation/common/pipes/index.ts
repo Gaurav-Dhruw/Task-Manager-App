@@ -1,1 +1,2 @@
-export * from './update-dto-validation.pipe'
+export * from './update-dto.pipe';
+export * from './request-query.pipe'

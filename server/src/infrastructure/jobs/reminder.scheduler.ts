@@ -19,6 +19,9 @@ export class ReminderScheduler implements IReminderScheduler {
 
   // Create a scheduled reminder.
   scheduleReminder(reminder: Reminder): void {
+    const cronJobs = this.schedulerRegistery.getCronJobs();
+    if(cronJobs.has(reminder.id)) return;
+
     const job = new CronJob(new Date(reminder.scheduled_for), () =>
       this.sendNotifications(reminder),
     );
@@ -31,6 +34,9 @@ export class ReminderScheduler implements IReminderScheduler {
 
   // Deletes the previos scheduled reminder and create a new one with new scheduled time.
   updateSchedule(reminder: Reminder): void {
+    const cronJobs = this.schedulerRegistery.getCronJobs();
+    if (!cronJobs.has(reminder.id)) return;
+
     this.schedulerRegistery.deleteCronJob(reminder.id);
 
     const job = new CronJob(new Date(reminder.scheduled_for), () =>
@@ -44,6 +50,9 @@ export class ReminderScheduler implements IReminderScheduler {
 
   // Deletes a scheduled reminder 
   deleteScheduledReminder(reminder_id: string): void {
+    const cronJobs = this.schedulerRegistery.getCronJobs();
+    if(!cronJobs.has(reminder_id)) return;
+
     this.schedulerRegistery.deleteCronJob(reminder_id);
     // console.log(`job ${reminder_id} removed`);
   }

@@ -1,7 +1,2 @@
-import { IsNotEmpty, IsUUID } from 'class-validator';
-
-export class GenericEntityDto {
-  @IsUUID()
-  @IsNotEmpty()
-  id: string;
-}
+export * from './pagination.dto';
+export * from './generic-entitiy.dto';

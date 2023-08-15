@@ -1,5 +1,5 @@
-import { EmailTemplate } from 'src/domain/types';
+import { IGenericEmailTemplate } from 'src/domain/types';
 
 export abstract class IEmailNotificationService {
-  abstract sendMails(data: EmailTemplate[]): Promise<void>;
+  abstract sendMails(data: IGenericEmailTemplate[]): Promise<void>;
 }

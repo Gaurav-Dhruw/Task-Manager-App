@@ -8,11 +8,14 @@ import {
   Param,
   ParseUUIDPipe,
   Get,
+  Query,
 } from '@nestjs/common';
 import { CommentUseCases } from 'src/application/use-cases/comment/comment.use-cases';
 import { CreateCommentDto, UpdateCommentDto } from './dtos';
 import { CustomRequest } from 'src/presentation/common/types';
 import { Comment, Task, User } from 'src/domain/entities';
+import { RequestQueryPipe } from 'src/presentation/common/pipes';
+import { PaginationDto } from 'src/presentation/common/dtos';
 
 @Controller('team/:team_id/task/:task_id/comment')
 export class CommentController {
@@ -31,14 +34,15 @@ export class CommentController {
     return this.commentUseCases.createComment(comment, team_id);
   }
 
-  @Get()
+  @Get('list')
   findAllComments(
     @Req() req: CustomRequest,
     @Param('team_id', ParseUUIDPipe) team_id: string,
     @Param('task_id', ParseUUIDPipe) task_id: string,
+    @Query(RequestQueryPipe) query: PaginationDto,
   ) {
     const requestUser = new User(req.user);
-    return this.commentUseCases.getAllComments(team_id, task_id, requestUser);
+    return this.commentUseCases.getAllComments(team_id, task_id, requestUser, query as any);
   }
 
   @Patch(':comment_id')
@@ -48,7 +52,7 @@ export class CommentController {
 
     @Body() commentDto: UpdateCommentDto,
   ) {
-    const comment = new Comment({...commentDto, id: comment_id});
+    const comment = new Comment({ ...commentDto, id: comment_id });
     const requestUser = new User(req.user);
 
     return this.commentUseCases.updateComment(comment, requestUser);

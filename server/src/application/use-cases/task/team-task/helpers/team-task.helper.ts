@@ -49,9 +49,7 @@ export class TeamTaskHelper {
     if (!this.validateInput.isValidTeam(team)) errorMsgs.push('Team Not Found');
 
     if (errorMsgs.length > 0) throw new NotFoundException(errorMsgs);
-  }
 
-  validateGetOperation(team: Team, task: Task): void {
     const isTeamTask = this.validateOperation.isTeamTask(task);
     const taskBelongsToTheTeam = this.validateOperation.taskBelongsToTheTeam(
       team,
@@ -59,6 +57,8 @@ export class TeamTaskHelper {
     );
     if (!isTeamTask || !taskBelongsToTheTeam) throw new BadRequestException();
   }
+
+
 
   // Create Use-Case Helpers
   validateCreateInput(team: Team): void {
@@ -97,9 +97,7 @@ export class TeamTaskHelper {
     if (!this.validateInput.isValidTask(task)) errorMsgs.push('Task Not Found');
 
     if (errorMsgs.length > 0) throw new NotFoundException(errorMsgs);
-  }
 
-  validateMutateOperation(team: Team, task: Task) {
     const isTeamTask = this.validateOperation.isTeamTask(task);
     const taskBelongsToTheTeam = this.validateOperation.taskBelongsToTheTeam(
       team,
@@ -107,6 +105,8 @@ export class TeamTaskHelper {
     );
     if (!isTeamTask || !taskBelongsToTheTeam) throw new BadRequestException();
   }
+
+
 
   // Assignment Use-Case Helpers
   checkIfTeamMembers(team: Team, usersList: User[]): void {

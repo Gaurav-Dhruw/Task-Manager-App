@@ -6,6 +6,7 @@ import {
 import { IDataService } from 'src/domain/abstracts';
 import { Task, User } from 'src/domain/entities';
 import { PersonalTaskHelper } from './helpers/personal-task.helper';
+import { IRequestQuery } from 'src/domain/types/request-query.type';
 
 @Injectable()
 export class PersonalTaskUseCases {
@@ -15,8 +16,20 @@ export class PersonalTaskUseCases {
   ) {}
 
   // Done
-  getAssignedTasks(user_id: string): Promise<Task[]> {
-    return this.dataService.task.getAll({user_id});
+  getAssignedTasks(user_id: string, query?: IRequestQuery): Promise<Task[]> {
+    const { search = '', pagination, where = {}, sort } = query || {};
+    const { page = 1, limit = 10 } = pagination || {};
+
+    return this.dataService.task.getAll({
+      where: {
+        ...where,
+        user_id,
+        title: search,
+        description: search,
+      },
+      sort,
+      pagination: { page, limit },
+    });
   }
 
   // Done
@@ -52,14 +65,14 @@ export class PersonalTaskUseCases {
   }
 
   //Done
-  async deleteTask(id: string, requestUser: User): Promise<void> {
-    const task = await this.dataService.task.getById(id);
+  async deleteTask(task_id: string, requestUser: User): Promise<void> {
+    const task = await this.dataService.task.getById(task_id);
     // Validates if task exists or not.
     this.helper.validateInput(task);
 
     // Checks if user is the creator of task.
     this.helper.checkAuthorization(task, requestUser);
 
-    await this.dataService.task.delete(id);
+    await this.dataService.task.delete(task_id);
   }
 }

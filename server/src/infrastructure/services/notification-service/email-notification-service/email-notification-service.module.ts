@@ -18,7 +18,7 @@ import { join } from 'path';
           },
         },
         defaults: {
-          from: `'No Reply' ${process.env.EMAIL_ID}`,
+          from: `'Task Manager' ${process.env.EMAIL_ID}`,
         },
 
         template: {

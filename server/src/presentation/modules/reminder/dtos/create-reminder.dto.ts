@@ -1,11 +1,6 @@
-import {
+import { IsNotEmpty, IsDateString, MinDate } from 'class-validator';
 
-  IsNotEmpty,
-  IsDateString,
-} from 'class-validator';
-
-export class createReminderDto {
-
+export class CreateReminderDto {
   @IsDateString()
   @IsNotEmpty()
   scheduled_for: Date;

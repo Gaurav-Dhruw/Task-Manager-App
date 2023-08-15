@@ -3,7 +3,7 @@
 import { Injectable } from '@nestjs/common';
 import { ITemplateEngine } from 'src/domain/abstracts';
 import { Reminder , Notification} from 'src/domain/entities';
-import { ReminderTemplate, EmailTemplate } from 'src/domain/types';
+import { IReminderTemplate, IEmailTemplate } from 'src/domain/types';
 
 @Injectable()
 export class ReminderSchedulerHelper {
@@ -16,7 +16,7 @@ export class ReminderSchedulerHelper {
 
     reminders.forEach((reminder) => {
       reminder.receivers?.forEach((receiver) => {
-        const template: ReminderTemplate = {
+        const template: IReminderTemplate = {
           template: 'reminder',
           context: {
             username: receiver.name,
@@ -40,13 +40,14 @@ export class ReminderSchedulerHelper {
     return notifications;
   }
 
-  notificationsToEmailOptions(notifications: Notification[]): EmailTemplate[] {
-    const emailOptions: EmailTemplate[] = [];
+  notificationsToEmailOptions(notifications: Notification[]): IEmailTemplate[] {
+    const emailOptions: IEmailTemplate[] = [];
 
     notifications.forEach((notification) => {
-      const emailOption: EmailTemplate = {
+      const emailOption: IEmailTemplate = {
         to: notification.receiver?.email,
         subject: notification.title,
+        template:'email-cover',
         context: {
           content: notification.content,
         },

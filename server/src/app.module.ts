@@ -18,6 +18,9 @@ import { SchedulerModule } from './infrastructure/jobs/scheduler.module';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(AuthMiddleware).exclude('auth').forRoutes('user', 'team');
+    consumer
+      .apply(AuthMiddleware)
+      .exclude('auth', 'user/update/credentials', 'otp')
+      .forRoutes('user', 'team');
   }
 }

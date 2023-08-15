@@ -2,7 +2,7 @@ import { readFileSync } from 'fs';
 import * as handlebars from 'handlebars';
 import { join } from 'path';
 import { ITemplateEngine } from 'src/domain/abstracts';
-import { NotificationTemplate } from 'src/domain/types';
+import { INotificationTemplate } from 'src/domain/types';
 
 export class TemplateEngine implements ITemplateEngine {
   private handlebars: typeof handlebars;
@@ -10,7 +10,7 @@ export class TemplateEngine implements ITemplateEngine {
     this.handlebars = handlebars;
   }
 
-  convert(data: NotificationTemplate): string {
+  convert(data: INotificationTemplate): string {
     const filePath = join(
       __dirname,
       'notification-templates',
